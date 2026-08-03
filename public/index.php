@@ -26,7 +26,7 @@ require_once __DIR__ .'/../includes/header.php';?>
     </div>
 
     <div class="hero-ticker">
-        <p class="ticker-label">Recent Exchnages</p>
+        <p class="ticker-label">Recent Exchanges</p>
         <ul class="ticker-list">
             <li></li>
             <li></li>
