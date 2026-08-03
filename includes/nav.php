@@ -12,7 +12,7 @@ if (!isset($isLoggedIn)) {
         <?php if ($isLoggedIn): ?>
             <!-- Logged-in user links -->
             <li><a href="/main/public/swaps.php">My Swaps</a></li>
-            <li><a href="/main/actions/logout.php">Logout</a></li>
+            <li><a href="/main/auth/logout.php">Logout</a></li>
         <?php else: ?>
             <!-- Guest user links -->
             <li><a href="/main/auth/login.php">Login</a></li>
