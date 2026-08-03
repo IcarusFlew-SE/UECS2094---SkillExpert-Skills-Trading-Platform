@@ -1,0 +1,18 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor/IDE folders
+.vscode/
+.idea/
+
+# Local environment config (if add DB credentials to a separate config file per-member)
+config/db.local.php
+
+# User-uploaded content
+assets/img/uploads/*
+!assets/img/uploads/.gitkeep
+
+# Logs, temp files
+*.log
+*.tmp
