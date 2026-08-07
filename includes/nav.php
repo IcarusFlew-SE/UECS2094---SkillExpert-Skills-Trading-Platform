@@ -1,22 +1,37 @@
 <?php
 // $isLoggedIn is set by header.php before this file is included.
 // Guard defensively in case nav.php is ever included standalone.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 if (!isset($isLoggedIn)) {
     $isLoggedIn = isset($_SESSION['user_id']);
 }
+$userName = $_SESSION['name'] ?? 'User';
 ?>
-<nav>
-    <ul>
-        <li><a href="/main/public/index.php">Home</a></li>
+<nav class="main-nav">
+    <div class="nav-container">
+        <a href="/main/public/index.php" class="nav-brand">SkillExpert</a>
 
-        <?php if ($isLoggedIn): ?>
-            <!-- Logged-in user links -->
-            <li><a href="/main/public/swaps.php">My Swaps</a></li>
-            <li><a href="/main/auth/logout.php">Logout</a></li>
-        <?php else: ?>
-            <!-- Guest user links -->
-            <li><a href="/main/auth/login.php">Login</a></li>
-            <li><a href="/main/auth/register.php">Register</a></li>
-        <?php endif; ?>
-    </ul>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle-checkbox">
+        <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+            <span class="hamburger"></span>
+        </label>
+
+        <ul class="nav-menu">
+            <?php if ($isLoggedIn): ?>
+                <!-- Logged-in state navigation -->
+                <li class="nav-item"><a href="/main/public/browse.php" class="nav-link">Browse</a></li>
+                <li class="nav-item"><a href="/main/public/swaps.php" class="nav-link">My Swaps</a></li>
+                <li class="nav-item nav-user-item">
+                    <span class="nav-user-name"><?php echo htmlspecialchars($userName); ?></span>
+                </li>
+                <li class="nav-item"><a href="/main/auth/logout.php" class="nav-link btn-logout">Logout</a></li>
+            <?php else: ?>
+                <!-- Logged-out state navigation -->
+                <li class="nav-item"><a href="/main/auth/login.php" class="nav-link">Login</a></li>
+                <li class="nav-item"><a href="/main/auth/register.php" class="nav-link btn-register">Register</a></li>
+            <?php endif; ?>
+        </ul>
+    </div>
 </nav>
