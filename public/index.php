@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../includes/db.php';
+<?php require_once __DIR__ . '/../config/db.php';
 $pageTitle = 'SkillExpert - Trade Skills, Not Money';
 
 $stmt = $pdo->query(
