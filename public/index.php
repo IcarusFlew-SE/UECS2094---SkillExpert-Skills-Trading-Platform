@@ -2,9 +2,9 @@
 $pageTitle = 'SkillExpert - Trade Skills, Not Money';
 
 $stmt = $pdo->query(
-    'SELECT skills.*, users.name AS teacher name
-    FROM skills JOIN users ON skills.user_id = users.id
-    ORDER BY skills.created_at DESC LIMIT 5'
+    'SELECT skills.*, users.name AS teacher_name
+    FROM skills JOIN users ON skills.userId = users.id
+    ORDER BY skills.createdAt DESC LIMIT 5'
 );
 
 $featuredSkills = $stmt->fetchAll();
