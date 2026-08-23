@@ -250,3 +250,414 @@ main {
         bottom: 0;
     }
 }
+
+/* ==========================================
+   Swap & Review Module (Barry)
+   Covers: public/swaps.php, public/details.php,
+           includes/review_form_partial.php
+   ========================================== */
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* --- Flash messages (Post/Redirect/Get banners) --- */
+.flash-msg {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.25rem;
+    font-weight: 500;
+}
+
+.flash-success {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.flash-error {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.empty-state,
+.info-note,
+.info-note-small {
+    color: var(--text-muted);
+    padding: 0.75rem 0;
+}
+
+.info-note-small {
+    font-size: 0.85rem;
+}
+
+/* --- Generic buttons --- */
+.btn {
+    display: inline-block;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-accept {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.btn-accept:hover {
+    background-color: #d1fae5;
+}
+
+.btn-decline {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.btn-decline:hover {
+    background-color: #fee2e2;
+}
+
+.btn-link-danger {
+    background: none;
+    border: none;
+    color: #dc2626;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.inline-form {
+    display: inline-block;
+}
+
+.sr-only-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+/* --- Status badges --- */
+.status-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.6rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-left: 0.5rem;
+}
+
+.status-pending   { background-color: #fef9c3; color: #854d0e; }
+.status-accepted  { background-color: #dbeafe; color: #1e40af; }
+.status-completed { background-color: #dcfce7; color: #166534; }
+.status-declined  { background-color: #fee2e2; color: #991b1b; }
+.status-cancelled { background-color: #f1f5f9; color: #475569; }
+
+/* --- My Swaps page (requests) --- */
+.swaps-tabs {
+    margin-top: 1.5rem;
+}
+
+.swap-tab-radio {
+    display: none;
+}
+
+.swap-tab-labels {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.25rem;
+}
+
+.swap-tab-labels label {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+}
+
+/* CSS-only tab switching: show the panel that matches the checked radio */
+.swap-tab-panel {
+    display: none;
+}
+
+#tab-received:checked ~ .swap-tab-labels label[for="tab-received"],
+#tab-sent:checked ~ .swap-tab-labels label[for="tab-sent"] {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+#tab-received:checked ~ #panel-received,
+#tab-sent:checked ~ #panel-sent {
+    display: block;
+}
+
+.swap-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.swap-card h3 {
+    margin-bottom: 0.25rem;
+}
+
+.swap-meta {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+}
+
+.swap-offer,
+.swap-message {
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+}
+
+.swap-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* --- Skill details page --- */
+.skill-detail-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.skill-category-tag {
+    display: inline-block;
+    background-color: rgba(79, 70, 229, 0.08);
+    color: var(--primary-color);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    margin-bottom: 0.5rem;
+}
+
+.skill-teacher {
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.skill-description {
+    line-height: 1.7;
+}
+
+.skill-rating-summary {
+    margin-top: 0.75rem;
+    font-weight: 600;
+}
+
+.stars {
+    color: #f59e0b;
+    letter-spacing: 1px;
+}
+
+.request-swap-section,
+.reviews-section,
+.comments-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.swap-request-form,
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 480px;
+}
+
+.swap-request-form select,
+.swap-request-form textarea,
+.comment-form textarea,
+.review-form textarea {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font: inherit;
+    resize: vertical;
+}
+
+.char-counter {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: -0.4rem;
+}
+
+.char-counter-low {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.js-inline-error {
+    color: #dc2626;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+/* --- Review list --- */
+.review-list,
+.comment-list {
+    list-style: none;
+    margin-top: 1rem;
+}
+
+.review-item,
+.comment-item {
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.85rem 0;
+}
+
+.review-header,
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.review-date,
+.comment-date {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.review-comment,
+.comment-text {
+    margin-top: 0.3rem;
+}
+
+/* --- Review form (star rating widget, CSS-only visual) --- */
+.review-partial {
+    margin-top: 0.75rem;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 0.75rem;
+}
+
+.review-done {
+    color: #166534;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 420px;
+}
+
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse; /* reversed DOM order + row-reverse = ascending visual order */
+    justify-content: flex-end;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.star-rating legend {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+}
+
+.star-rating input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.star-rating label {
+    font-size: 1.6rem;
+    line-height: 1;
+    color: #d1d5db;
+    cursor: pointer;
+    padding: 0 0.05rem;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #f59e0b;
+}
+
+/* --- Responsive: tablet & mobile (CSS media queries only) --- */
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem 1rem;
+    }
+
+    .swap-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .swap-actions .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .swap-tab-labels {
+        gap: 0;
+    }
+
+    .swap-tab-labels label {
+        flex: 1;
+        text-align: center;
+        padding: 0.6rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .review-header,
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.15rem;
+    }
+
+    .star-rating label {
+        font-size: 2rem; /* larger tap target on touch screens */
+    }
+}
