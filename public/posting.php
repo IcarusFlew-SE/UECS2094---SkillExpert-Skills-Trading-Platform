@@ -400,7 +400,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     <form
                         id="skill-form"
                         method="POST"
-                        action="../actions/create_skill.php"
+                        action="../actions/create_skills.php"
                     >
 
 
