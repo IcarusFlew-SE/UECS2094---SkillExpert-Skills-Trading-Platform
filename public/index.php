@@ -20,8 +20,8 @@ require_once __DIR__ .'/../includes/header.php';?>
         </h1>
         <p class="hero-sub">Why use Money? When you can just swap time, earn credits, spend them learning from experts.</p>
         <div class="hero-actions">
-            <a href="listing.php" class="btn btn-primary">Browse Skills Now</a>
-            <a href="/auth/register.php" class="btn btn-ghost">Join For Free!</a>
+            <a href="/main/public/browse.php" class="btn btn-primary">Browse Skills Now</a>
+            <a href="/main/auth/register.php" class="btn btn-ghost">Join For Free!</a>
         </div>
     </div>
 
@@ -39,7 +39,7 @@ require_once __DIR__ .'/../includes/header.php';?>
 <section class="skill-directory">
     <div class="section-header">
         <h2>Featured Skills</h2>
-        <a href="listing.php" class="see-all">Browse All &rarr;</a>
+        <a href="/main/public/browse.php" class="see-all">Browse All &rarr;</a>
     </div>
 
     <?php if(empty($featuredSkills)): ?>
