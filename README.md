@@ -88,12 +88,4 @@ assets/     css/, js/, img/
   in the project report.
 
 ## 6. Known issues in shared code (flag for the team, not yet fixed here)
-
-- `public/index.php` requires `includes/db.php`, but the DB connection file
-  actually lives at `config/db.php` — this will fatal-error until the path
-  is corrected. Its SQL also has an invalid column alias (`AS teacher name`
-  — needs an underscore or backticks).
-- `database/schema.sql`'s `skills` table originally had a foreign key
-  pointing at a non-existent `user` table (singular); this has been fixed
-  to `users` (plural) so the schema can actually run — see the comment at
-  the top of that file.
+**Currently None**
