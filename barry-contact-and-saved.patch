@@ -1,0 +1,682 @@
+diff --git a/actions/contact_submit.php b/actions/contact_submit.php
+new file mode 100644
+index 0000000..17bb64e
+--- /dev/null
++++ b/actions/contact_submit.php
+@@ -0,0 +1,70 @@
++<?php
++/**
++ * Handles Contact page form submissions (Create).
++ *
++ * POST only. No login required — a contact form needs to work for
++ * visitors too. If the sender happens to be logged in, we still record
++ * their userId (nullable column) purely so the message can be traced back
++ * to an account later; it's not required for the insert to succeed.
++ *
++ * Expected POST fields:
++ *   name     string, required
++ *   email    string, required, valid email format
++ *   subject  string, optional
++ *   message  string, required (max 2000 chars)
++ */
++
++if (session_status() === PHP_SESSION_NONE) {
++    session_start();
++}
++
++require_once __DIR__ . '/../config/db.php';
++require_once __DIR__ . '/../includes/swap_functions.php'; // setFlash()/getAndClearFlash()
++
++if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
++    header("Location: /main/public/contact.php");
++    exit;
++}
++
++$name    = trim($_POST['name'] ?? '');
++$email   = trim($_POST['email'] ?? '');
++$subject = trim($_POST['subject'] ?? '');
++$message = trim($_POST['message'] ?? '');
++
++$errors = [];
++if ($name === '') {
++    $errors[] = 'Name is required.';
++}
++if ($email === '') {
++    $errors[] = 'Email is required.';
++} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
++    $errors[] = 'Enter a valid email address.';
++}
++if ($message === '') {
++    $errors[] = 'Message is required.';
++}
++
++if (strlen($message) > 2000) {
++    $message = substr($message, 0, 2000);
++}
++if (strlen($subject) > 150) {
++    $subject = substr($subject, 0, 150);
++}
++
++if (!empty($errors)) {
++    setFlash('error', implode(' ', $errors));
++    header("Location: /main/public/contact.php");
++    exit;
++}
++
++$userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
++
++$stmt = $pdo->prepare(
++    "INSERT INTO contactMessages (userId, name, email, subject, message)
++     VALUES (?, ?, ?, ?, ?)"
++);
++$stmt->execute([$userId, $name, $email, $subject !== '' ? $subject : null, $message]);
++
++setFlash('success', "Thanks, {$name} — your message has been sent. We'll get back to you soon.");
++header("Location: /main/public/contact.php");
++exit;
+diff --git a/actions/skill_save.php b/actions/skill_save.php
+new file mode 100644
+index 0000000..1f128c9
+--- /dev/null
++++ b/actions/skill_save.php
+@@ -0,0 +1,65 @@
++<?php
++/**
++ * Adds a skill to the current user's saved/wishlist list (Create).
++ *
++ * POST only. Requires login — saved items are personal data, and the
++ * assignment specifically requires login before accessing features like
++ * this ("Users must register and log in before accessing features that
++ * store personal information, such as saved items, cart, wishlist...").
++ *
++ * Expected POST fields: skill_id int, required.
++ */
++
++require_once __DIR__ . '/../auth/session_check.php';
++require_once __DIR__ . '/../config/db.php';
++require_once __DIR__ . '/../includes/swap_functions.php';  // setFlash()/getAndClearFlash()
++require_once __DIR__ . '/../includes/saved_functions.php';
++
++$currentUserId = (int) $_SESSION['user_id'];
++
++if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
++    header("Location: /main/public/browse.php");
++    exit;
++}
++
++$skillId = filter_input(INPUT_POST, 'skill_id', FILTER_VALIDATE_INT);
++$redirectTarget = "/main/public/details.php?id=" . ($skillId ?: '');
++
++if (!$skillId) {
++    setFlash('error', 'Missing skill.');
++    header("Location: /main/public/browse.php");
++    exit;
++}
++
++// Confirm the skill exists, and grab its owner so we can block self-saves.
++$stmt = $pdo->prepare("SELECT id, userId FROM skills WHERE id = ? LIMIT 1");
++$stmt->execute([$skillId]);
++$skill = $stmt->fetch();
++
++if (!$skill) {
++    setFlash('error', 'That skill no longer exists.');
++    header("Location: /main/public/browse.php");
++    exit;
++}
++
++if ((int) $skill['userId'] === $currentUserId) {
++    setFlash('error', "You can't save your own skill.");
++    header("Location: $redirectTarget");
++    exit;
++}
++
++try {
++    $stmt = $pdo->prepare("INSERT INTO savedSkills (userId, skillId) VALUES (?, ?)");
++    $stmt->execute([$currentUserId, $skillId]);
++    setFlash('success', 'Saved — find it on your Saved page.');
++} catch (PDOException $e) {
++    // 23000 = unique constraint violation (already saved this one).
++    if ($e->getCode() === '23000') {
++        setFlash('error', "You've already saved this skill.");
++    } else {
++        throw $e;
++    }
++}
++
++header("Location: $redirectTarget");
++exit;
+diff --git a/actions/skill_unsave.php b/actions/skill_unsave.php
+new file mode 100644
+index 0000000..ae4d32b
+--- /dev/null
++++ b/actions/skill_unsave.php
+@@ -0,0 +1,51 @@
++<?php
++/**
++ * Removes a skill from the current user's saved list (Delete).
++ *
++ * POST only. Requires login. Ownership is baked directly into the DELETE
++ * (userId = the logged-in user) rather than checked separately — if the
++ * row isn't theirs, rowCount() is 0 and nothing happens.
++ *
++ * Expected POST fields:
++ *   skill_id   int, required
++ *   return_to  string, optional — where to redirect back to (defaults to
++ *              the Saved page; details.php passes its own URL so unsaving
++ *              from there doesn't bounce you away from what you're looking at)
++ */
++
++require_once __DIR__ . '/../auth/session_check.php';
++require_once __DIR__ . '/../config/db.php';
++require_once __DIR__ . '/../includes/swap_functions.php';
++
++$currentUserId = (int) $_SESSION['user_id'];
++
++if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
++    header("Location: /main/public/saved.php");
++    exit;
++}
++
++$skillId  = filter_input(INPUT_POST, 'skill_id', FILTER_VALIDATE_INT);
++$returnTo = $_POST['return_to'] ?? '/main/public/saved.php';
++
++// Only allow redirecting back within this app's own pages.
++if (!is_string($returnTo) || strpos($returnTo, '/main/') !== 0) {
++    $returnTo = '/main/public/saved.php';
++}
++
++if (!$skillId) {
++    setFlash('error', 'Invalid skill.');
++    header("Location: $returnTo");
++    exit;
++}
++
++$stmt = $pdo->prepare("DELETE FROM savedSkills WHERE userId = ? AND skillId = ?");
++$stmt->execute([$currentUserId, $skillId]);
++
++if ($stmt->rowCount() > 0) {
++    setFlash('success', 'Removed from your saved list.');
++} else {
++    setFlash('error', "That wasn't in your saved list.");
++}
++
++header("Location: $returnTo");
++exit;
+diff --git a/assets/css/style.css b/assets/css/style.css
+index cf58702..ba08a62 100644
+--- a/assets/css/style.css
++++ b/assets/css/style.css
+@@ -661,3 +661,93 @@ main {
+         font-size: 2rem; /* larger tap target on touch screens */
+     }
+ }
++
++/* ==========================================
++   Contact & Saved-items module (Barry)
++   Covers: public/contact.php, public/saved.php,
++           the Save/Unsave button on public/details.php
++   ========================================== */
++
++.save-action {
++    margin-top: 1rem;
++}
++
++/* --- Contact page --- */
++.contact-layout {
++    display: grid;
++    grid-template-columns: 1fr 1.3fr;
++    gap: 2rem;
++    margin-top: 1.5rem;
++}
++
++.contact-info h2,
++.contact-form-card h2 {
++    margin-bottom: 0.75rem;
++}
++
++.contact-line {
++    margin-bottom: 0.6rem;
++}
++
++.contact-info h3 {
++    margin-top: 1.5rem;
++    margin-bottom: 0.5rem;
++    font-size: 1rem;
++}
++
++.social-links {
++    list-style: none;
++    display: flex;
++    gap: 1rem;
++}
++
++.contact-form-card {
++    background-color: var(--card-bg);
++    border: 1px solid var(--border-color);
++    border-radius: 8px;
++    padding: 1.5rem;
++    box-shadow: var(--shadow-sm);
++}
++
++.contact-form {
++    display: flex;
++    flex-direction: column;
++    gap: 0.6rem;
++}
++
++.contact-form input,
++.contact-form textarea {
++    padding: 0.5rem 0.6rem;
++    border: 1px solid var(--border-color);
++    border-radius: 6px;
++    font: inherit;
++}
++
++.contact-form textarea {
++    resize: vertical;
++}
++
++/* --- Saved page --- */
++.saved-list {
++    margin-top: 1.5rem;
++}
++
++.saved-card {
++    background-color: var(--card-bg);
++    border: 1px solid var(--border-color);
++    border-radius: 8px;
++    padding: 1rem 1.25rem;
++    margin-bottom: 1rem;
++    box-shadow: var(--shadow-sm);
++}
++
++.saved-card h3 {
++    margin: 0.25rem 0;
++}
++
++/* --- Responsive: stack contact columns on tablet/mobile --- */
++@media (max-width: 768px) {
++    .contact-layout {
++        grid-template-columns: 1fr;
++    }
++}
+diff --git a/auth/session_check.php b/auth/session_check.php
+index 4662490..9f89300 100644
+--- a/auth/session_check.php
++++ b/auth/session_check.php
+@@ -3,6 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
+     session_start();
+ }
+ if (!isset($_SESSION['user_id'])) {
+-    header("Location: /auth/login.php");
++    header("Location: /main/auth/login.php");
+     exit; // exit - prevents the rest of the page executing after a redirect header, db runs and data leakage
+ }
+diff --git a/database/schema.sql b/database/schema.sql
+index f207711..0378a44 100644
+--- a/database/schema.sql
++++ b/database/schema.sql
+@@ -118,6 +118,45 @@ CREATE TABLE IF NOT EXISTS comments (
+     INDEX idx_skill (skillId)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ 
++-- ============================================================
++-- Contact & Saved-items module (Barry)
++-- ============================================================
++
++-- Table: savedSkills
++-- A logged-in user's wishlist/bookmark list. Users must register and log in
++-- before accessing saved items (per the assignment's login requirement).
++-- unique_save stops the same skill being saved twice by the same user.
++CREATE TABLE IF NOT EXISTS savedSkills (
++    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
++    userId INT UNSIGNED NOT NULL,
++    skillId INT UNSIGNED NOT NULL,
++    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
++
++    PRIMARY KEY (id),
++    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
++    FOREIGN KEY (skillId) REFERENCES skills(id) ON DELETE CASCADE,
++    UNIQUE KEY unique_save (userId, skillId),
++    INDEX idx_user (userId)
++) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
++
++-- Table: contactMessages
++-- Submissions from the public Contact page. No login required to submit —
++-- userId is filled in when the sender happens to be logged in, purely so a
++-- message can be traced back to an account later; NULL otherwise.
++CREATE TABLE IF NOT EXISTS contactMessages (
++    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
++    userId INT UNSIGNED DEFAULT NULL,
++    name VARCHAR(100) NOT NULL,
++    email VARCHAR(150) NOT NULL,
++    subject VARCHAR(150) DEFAULT NULL,
++    message TEXT NOT NULL,
++    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
++
++    PRIMARY KEY (id),
++    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE SET NULL,
++    INDEX idx_createdAt (createdAt)
++) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
++
+ -- ============================================================
+ -- Demo / seed data
+ -- Lets you log in and click through the swap + review + comment flow
+@@ -158,3 +197,13 @@ INSERT INTO reviews (swapId, userId, rating, comment) VALUES
+ INSERT INTO comments (skillId, userId, commentText) VALUES
+ (1, 3, 'Do you cover fingerstyle at all, or mostly strumming?'),
+ (2, 4, 'What level of Spanish do you start from — total beginner okay?');
++
++-- Chandra has saved two skills to look at later
++INSERT INTO savedSkills (userId, skillId) VALUES
++(3, 1),
++(3, 2);
++
++-- A sample contact form submission, one from a logged-in user and one anonymous
++INSERT INTO contactMessages (userId, name, email, subject, message) VALUES
++(1, 'Alice Tan', 'alice@example.com', 'Question about categories', 'Is there a category for cooking skills, or should I use "Other"?'),
++(NULL, 'Guest Visitor', 'guest@example.com', 'General feedback', 'Really like the concept of swapping skills instead of paying — nice work!');
+diff --git a/includes/footer.php b/includes/footer.php
+index e956395..94a3951 100644
+--- a/includes/footer.php
++++ b/includes/footer.php
+@@ -1,6 +1,7 @@
+ </main>
+ 
+ <footer>
++    <p><a href="/main/public/contact.php">Contact Us</a></p>
+     <p>&copy; <?php echo date('Y'); ?> SkillExpert. Swap It To Learn It.</p>
+ </footer>
+ 
+diff --git a/includes/nav.php b/includes/nav.php
+index 6f65f35..2a258f5 100644
+--- a/includes/nav.php
++++ b/includes/nav.php
+@@ -22,6 +22,7 @@ $userName = $_SESSION['name'] ?? 'User';
+             <?php if ($isLoggedIn): ?>
+                 <!-- Logged-in state navigation -->
+                 <li class="nav-item"><a href="/main/public/browse.php" class="nav-link">Browse</a></li>
++                <li class="nav-item"><a href="/main/public/saved.php" class="nav-link">Saved</a></li>
+                 <li class="nav-item"><a href="/main/public/swaps.php" class="nav-link">My Swaps</a></li>
+                 <li class="nav-item nav-user-item">
+                     <span class="nav-user-name"><?php echo htmlspecialchars($userName); ?></span>
+diff --git a/includes/saved_functions.php b/includes/saved_functions.php
+new file mode 100644
+index 0000000..3ebdef7
+--- /dev/null
++++ b/includes/saved_functions.php
+@@ -0,0 +1,37 @@
++<?php
++/**
++ * Shared helper functions for the Saved/Wishlist feature (Barry).
++ * Same pattern as includes/swap_functions.php — plain functions over a
++ * PDO connection passed in explicitly.
++ */
++
++/**
++ * All skills the given user has saved, newest-saved first, joined with the
++ * skill's own details and the teacher's name so the Saved page can render
++ * a full card without extra queries per row.
++ */
++function getSavedSkillsForUser(PDO $pdo, int $userId): array
++{
++    $stmt = $pdo->prepare(
++        "SELECT sk.*, u.name AS teacherName, ss.createdAt AS savedAt
++         FROM savedSkills ss
++         JOIN skills sk ON ss.skillId = sk.id
++         JOIN users u   ON sk.userId = u.id
++         WHERE ss.userId = ?
++         ORDER BY ss.createdAt DESC"
++    );
++    $stmt->execute([$userId]);
++    return $stmt->fetchAll();
++}
++
++/**
++ * Has this user already saved this skill? Used to decide whether details.php
++ * shows a "Save" or "Unsave" button (the DB's unique_save constraint is the
++ * real guarantee against duplicates — this is just for the UI state).
++ */
++function isSkillSavedByUser(PDO $pdo, int $userId, int $skillId): bool
++{
++    $stmt = $pdo->prepare("SELECT 1 FROM savedSkills WHERE userId = ? AND skillId = ? LIMIT 1");
++    $stmt->execute([$userId, $skillId]);
++    return (bool) $stmt->fetch();
++}
+diff --git a/public/contact.php b/public/contact.php
+new file mode 100644
+index 0000000..97529a4
+--- /dev/null
++++ b/public/contact.php
+@@ -0,0 +1,108 @@
++<?php
++/**
++ * Contact Page — static contact details + a real working contact form.
++ * No login required; works for visitors and logged-in users alike.
++ */
++
++if (session_status() === PHP_SESSION_NONE) {
++    session_start();
++}
++
++require_once __DIR__ . '/../includes/swap_functions.php'; // getAndClearFlash()
++
++$pageTitle = 'Contact Us - SkillExpert';
++$flash     = getAndClearFlash();
++
++// Pre-fill name/email for a logged-in visitor so they don't have to retype them.
++$prefillName  = $_SESSION['name'] ?? '';
++$prefillEmail = '';
++if (isset($_SESSION['user_id'])) {
++    require_once __DIR__ . '/../config/db.php';
++    $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ? LIMIT 1");
++    $stmt->execute([(int) $_SESSION['user_id']]);
++    $row = $stmt->fetch();
++    if ($row) {
++        $prefillEmail = $row['email'];
++    }
++}
++
++require_once __DIR__ . '/../includes/header.php';
++?>
++
++<section class="container contact-page">
++    <h1>Contact Us</h1>
++    <p>Questions, feedback, or something not working right? Reach out — we'd love to hear from you.</p>
++
++    <?php if ($flash): ?>
++        <p class="flash-msg flash-<?php echo htmlspecialchars($flash['type']); ?>">
++            <?php echo htmlspecialchars($flash['text']); ?>
++        </p>
++    <?php endif; ?>
++
++    <div class="contact-layout">
++        <div class="contact-info">
++            <h2>Get in touch</h2>
++
++            <p class="contact-line">
++                <strong>Email:</strong>
++                <a href="mailto:hello@skillexpert.example">hello@skillexpert.example</a>
++            </p>
++            <p class="contact-line">
++                <strong>Phone:</strong>
++                <a href="tel:+60123456789">+60 12-345 6789</a>
++            </p>
++            <p class="contact-line">
++                <strong>Address:</strong>
++                Universiti Tunku Abdul Rahman, Kampar Campus, Perak, Malaysia
++            </p>
++
++            <h3>Follow us</h3>
++            <ul class="social-links">
++                <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
++                <li><a href="#" target="_blank" rel="noopener">Twitter / X</a></li>
++                <li><a href="#" target="_blank" rel="noopener">Facebook</a></li>
++            </ul>
++        </div>
++
++        <div class="contact-form-card">
++            <h2>Send a message</h2>
++            <form method="POST" action="/main/actions/contact_submit.php" class="contact-form">
++                <label for="contact-name">Name</label>
++                <input
++                    type="text"
++                    id="contact-name"
++                    name="name"
++                    value="<?php echo htmlspecialchars($prefillName); ?>"
++                    maxlength="100"
++                    required
++                >
++
++                <label for="contact-email">Email</label>
++                <input
++                    type="email"
++                    id="contact-email"
++                    name="email"
++                    value="<?php echo htmlspecialchars($prefillEmail); ?>"
++                    maxlength="150"
++                    required
++                >
++
++                <label for="contact-subject">Subject (optional)</label>
++                <input type="text" id="contact-subject" name="subject" maxlength="150">
++
++                <label for="contact-message">Message</label>
++                <textarea
++                    id="contact-message"
++                    name="message"
++                    maxlength="2000"
++                    rows="5"
++                    required
++                ></textarea>
++
++                <button type="submit" class="btn btn-primary">Send Message</button>
++            </form>
++        </div>
++    </div>
++</section>
++
++<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+diff --git a/public/details.php b/public/details.php
+index 24f03ba..4f1150d 100644
+--- a/public/details.php
++++ b/public/details.php
+@@ -21,6 +21,7 @@ if (session_status() === PHP_SESSION_NONE) {
+ 
+ require_once __DIR__ . '/../config/db.php';
+ require_once __DIR__ . '/../includes/swap_functions.php';
++require_once __DIR__ . '/../includes/saved_functions.php';
+ 
+ $isLoggedIn    = isset($_SESSION['user_id']);
+ $currentUserId = $isLoggedIn ? (int) $_SESSION['user_id'] : null;
+@@ -49,6 +50,7 @@ $myOwnSkills   = [];
+ $reviews       = [];
+ $ratingSummary = ['avgRating' => null, 'reviewCount' => 0];
+ $comments      = [];
++$isSaved       = false;
+ 
+ if ($skill) {
+     $isOwner = $isLoggedIn && ((int) $skill['userId'] === $currentUserId);
+@@ -58,6 +60,8 @@ if ($skill) {
+         $stmt = $pdo->prepare("SELECT id, title FROM skills WHERE userId = ? ORDER BY title");
+         $stmt->execute([$currentUserId]);
+         $myOwnSkills = $stmt->fetchAll();
++
++        $isSaved = isSkillSavedByUser($pdo, $currentUserId, (int) $skill['id']);
+     }
+ 
+     $reviews       = getReviewsForSkill($pdo, (int) $skill['id']);
+@@ -97,6 +101,25 @@ require_once __DIR__ . '/../includes/header.php';
+         </article>
+         <!-- =================== END SKILL INFO — placeholder =================== -->
+ 
++        <!-- ===================== Save / Unsave (Barry) ===================== -->
++        <?php if ($isLoggedIn && !$isOwner): ?>
++            <div class="save-action">
++                <?php if ($isSaved): ?>
++                    <form method="POST" action="/main/actions/skill_unsave.php" class="inline-form">
++                        <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
++                        <input type="hidden" name="return_to" value="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
++                        <button type="submit" class="btn btn-decline">★ Saved — remove</button>
++                    </form>
++                <?php else: ?>
++                    <form method="POST" action="/main/actions/skill_save.php" class="inline-form">
++                        <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
++                        <button type="submit" class="btn btn-accept">☆ Save for later</button>
++                    </form>
++                <?php endif; ?>
++            </div>
++        <?php endif; ?>
++        <!-- =================== END Save / Unsave (Barry) =================== -->
++
+         <!-- ===================== Request a Swap (Barry) ===================== -->
+         <section class="request-swap-section">
+             <?php if ($isOwner): ?>
+diff --git a/public/saved.php b/public/saved.php
+new file mode 100644
+index 0000000..7a9799b
+--- /dev/null
++++ b/public/saved.php
+@@ -0,0 +1,62 @@
++<?php
++/**
++ * Saved/Wishlist Page — everything the logged-in user has bookmarked.
++ * Requires login (auth/session_check.php redirects otherwise), per the
++ * assignment's rule that saved items need an account.
++ */
++
++require_once __DIR__ . '/../auth/session_check.php';
++require_once __DIR__ . '/../config/db.php';
++require_once __DIR__ . '/../includes/swap_functions.php';  // getAndClearFlash()
++require_once __DIR__ . '/../includes/saved_functions.php';
++
++$pageTitle     = 'Saved Skills - SkillExpert';
++$currentUserId = (int) $_SESSION['user_id'];
++
++$savedSkills = getSavedSkillsForUser($pdo, $currentUserId);
++$flash       = getAndClearFlash();
++
++require_once __DIR__ . '/../includes/header.php';
++?>
++
++<section class="container saved-page">
++    <h1>Saved Skills</h1>
++    <p>Skills you've bookmarked to look at or request later.</p>
++
++    <?php if ($flash): ?>
++        <p class="flash-msg flash-<?php echo htmlspecialchars($flash['type']); ?>">
++            <?php echo htmlspecialchars($flash['text']); ?>
++        </p>
++    <?php endif; ?>
++
++    <?php if (empty($savedSkills)): ?>
++        <p class="empty-state">
++            Nothing saved yet. <a href="/main/public/browse.php">Browse skills</a> and tap "Save" on
++            anything you'd like to come back to.
++        </p>
++    <?php else: ?>
++        <div class="saved-list">
++            <?php foreach ($savedSkills as $skill): ?>
++                <article class="saved-card">
++                    <div class="saved-card-main">
++                        <p class="skill-category-tag"><?php echo htmlspecialchars($skill['category']); ?></p>
++                        <h3><a href="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
++                            <?php echo htmlspecialchars($skill['title']); ?>
++                        </a></h3>
++                        <p class="swap-meta">Taught by <strong><?php echo htmlspecialchars($skill['teacherName']); ?></strong></p>
++                    </div>
++                    <div class="swap-actions">
++                        <a href="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>" class="btn btn-primary">View Details</a>
++                        <form method="POST" action="/main/actions/skill_unsave.php" class="inline-form">
++                            <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
++                            <input type="hidden" name="return_to" value="/main/public/saved.php">
++                            <button type="submit" class="btn btn-decline" data-confirm="Remove this skill from your saved list?">Unsave</button>
++                        </form>
++                    </div>
++                </article>
++            <?php endforeach; ?>
++        </div>
++    <?php endif; ?>
++</section>
++
++<?php require_once __DIR__ . '/../includes/footer.php'; ?>

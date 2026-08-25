@@ -1,6 +1,7 @@
 </main>
 
 <footer>
+    <p><a href="/main/public/contact.php">Contact Us</a></p>
     <p>&copy; <?php echo date('Y'); ?> SkillExpert. Swap It To Learn It.</p>
 </footer>
 

@@ -119,6 +119,45 @@ CREATE TABLE IF NOT EXISTS comments (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
+-- Contact & Saved-items module (Barry)
+-- ============================================================
+
+-- Table: savedSkills
+-- A logged-in user's wishlist/bookmark list. Users must register and log in
+-- before accessing saved items (per the assignment's login requirement).
+-- unique_save stops the same skill being saved twice by the same user.
+CREATE TABLE IF NOT EXISTS savedSkills (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    userId INT UNSIGNED NOT NULL,
+    skillId INT UNSIGNED NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (skillId) REFERENCES skills(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_save (userId, skillId),
+    INDEX idx_user (userId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: contactMessages
+-- Submissions from the public Contact page. No login required to submit —
+-- userId is filled in when the sender happens to be logged in, purely so a
+-- message can be traced back to an account later; NULL otherwise.
+CREATE TABLE IF NOT EXISTS contactMessages (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    userId INT UNSIGNED DEFAULT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    subject VARCHAR(150) DEFAULT NULL,
+    message TEXT NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_createdAt (createdAt)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
 -- Demo / seed data
 -- Lets you log in and click through the swap + review + comment flow
 -- immediately after running this file, without registering by hand first.
@@ -158,3 +197,13 @@ INSERT INTO reviews (swapId, userId, rating, comment) VALUES
 INSERT INTO comments (skillId, userId, commentText) VALUES
 (1, 3, 'Do you cover fingerstyle at all, or mostly strumming?'),
 (2, 4, 'What level of Spanish do you start from — total beginner okay?');
+
+-- Chandra has saved two skills to look at later
+INSERT INTO savedSkills (userId, skillId) VALUES
+(3, 1),
+(3, 2);
+
+-- A sample contact form submission, one from a logged-in user and one anonymous
+INSERT INTO contactMessages (userId, name, email, subject, message) VALUES
+(1, 'Alice Tan', 'alice@example.com', 'Question about categories', 'Is there a category for cooking skills, or should I use "Other"?'),
+(NULL, 'Guest Visitor', 'guest@example.com', 'General feedback', 'Really like the concept of swapping skills instead of paying — nice work!');

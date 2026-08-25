@@ -661,3 +661,93 @@ main {
         font-size: 2rem; /* larger tap target on touch screens */
     }
 }
+
+/* ==========================================
+   Contact & Saved-items module (Barry)
+   Covers: public/contact.php, public/saved.php,
+           the Save/Unsave button on public/details.php
+   ========================================== */
+
+.save-action {
+    margin-top: 1rem;
+}
+
+/* --- Contact page --- */
+.contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.contact-info h2,
+.contact-form-card h2 {
+    margin-bottom: 0.75rem;
+}
+
+.contact-line {
+    margin-bottom: 0.6rem;
+}
+
+.contact-info h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.social-links {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+}
+
+.contact-form-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font: inherit;
+}
+
+.contact-form textarea {
+    resize: vertical;
+}
+
+/* --- Saved page --- */
+.saved-list {
+    margin-top: 1.5rem;
+}
+
+.saved-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.saved-card h3 {
+    margin: 0.25rem 0;
+}
+
+/* --- Responsive: stack contact columns on tablet/mobile --- */
+@media (max-width: 768px) {
+    .contact-layout {
+        grid-template-columns: 1fr;
+    }
+}

@@ -22,6 +22,7 @@ $userName = $_SESSION['name'] ?? 'User';
             <?php if ($isLoggedIn): ?>
                 <!-- Logged-in state navigation -->
                 <li class="nav-item"><a href="/main/public/browse.php" class="nav-link">Browse</a></li>
+                <li class="nav-item"><a href="/main/public/saved.php" class="nav-link">Saved</a></li>
                 <li class="nav-item"><a href="/main/public/posting.php" class="nav-link">Post a Skill</a></li>
                 <li class="nav-item"><a href="/main/public/swaps.php" class="nav-link">My Swaps</a></li>
                 <li class="nav-item nav-user-item">

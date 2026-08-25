@@ -21,6 +21,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/swap_functions.php';
+require_once __DIR__ . '/../includes/saved_functions.php';
 
 $isLoggedIn    = isset($_SESSION['user_id']);
 $currentUserId = $isLoggedIn ? (int) $_SESSION['user_id'] : null;
@@ -49,6 +50,7 @@ $myOwnSkills   = [];
 $reviews       = [];
 $ratingSummary = ['avgRating' => null, 'reviewCount' => 0];
 $comments      = [];
+$isSaved       = false;
 
 if ($skill) {
     $isOwner = $isLoggedIn && ((int) $skill['userId'] === $currentUserId);
@@ -58,6 +60,8 @@ if ($skill) {
         $stmt = $pdo->prepare("SELECT id, title FROM skills WHERE userId = ? ORDER BY title");
         $stmt->execute([$currentUserId]);
         $myOwnSkills = $stmt->fetchAll();
+
+        $isSaved = isSkillSavedByUser($pdo, $currentUserId, (int) $skill['id']);
     }
 
     $reviews       = getReviewsForSkill($pdo, (int) $skill['id']);
@@ -96,6 +100,25 @@ require_once __DIR__ . '/../includes/header.php';
             <?php endif; ?>
         </article>
         <!-- =================== END SKILL INFO — placeholder =================== -->
+
+        <!-- ===================== Save / Unsave (Barry) ===================== -->
+        <?php if ($isLoggedIn && !$isOwner): ?>
+            <div class="save-action">
+                <?php if ($isSaved): ?>
+                    <form method="POST" action="/main/actions/skill_unsave.php" class="inline-form">
+                        <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
+                        <input type="hidden" name="return_to" value="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
+                        <button type="submit" class="btn btn-decline">★ Saved — remove</button>
+                    </form>
+                <?php else: ?>
+                    <form method="POST" action="/main/actions/skill_save.php" class="inline-form">
+                        <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
+                        <button type="submit" class="btn btn-accept">☆ Save for later</button>
+                    </form>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+        <!-- =================== END Save / Unsave (Barry) =================== -->
 
         <!-- ===================== Request a Swap (Barry) ===================== -->
         <section class="request-swap-section">
