@@ -88,7 +88,7 @@ function renderSwapActions(array $swap, string $viewerRole, int $currentUserId):
             <?php if (empty($received)): ?>
                 <div class="empty-state">
                     <p>No incoming swap requests at the moment.</p>
-                    <p style="margin-top: 0.5rem;"><small>Make sure your skills have clear descriptions to attract more learners!</small></p>
+                    <p class="mt-1"><small>Make sure your skills have clear descriptions to attract more learners!</small></p>
                 </div>
             <?php else: ?>
                 <?php foreach ($received as $swap): ?>
@@ -133,7 +133,7 @@ function renderSwapActions(array $swap, string $viewerRole, int $currentUserId):
             <?php if (empty($sent)): ?>
                 <div class="empty-state">
                     <p>You haven't requested any skill swaps yet.</p>
-                    <p style="margin-top: 0.75rem;"><a href="/main/public/browse.php" class="btn btn-primary">Browse Skills to Trade</a></p>
+                    <p class="mt-2"><a href="/main/public/browse.php" class="btn btn-primary">Browse Skills to Trade</a></p>
                 </div>
             <?php else: ?>
                 <?php foreach ($sent as $swap): ?>

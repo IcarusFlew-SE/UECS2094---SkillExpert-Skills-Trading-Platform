@@ -100,7 +100,7 @@ require_once __DIR__ . '/../includes/header.php';
                         maxlength="100"
                         placeholder="e.g. Alice Tan"
                         required
-                        style="width: 100%; margin-top: 0.5rem;"
+                        class="form-control"
                     >
                 </div>
 
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../includes/header.php';
                         maxlength="150"
                         placeholder="you@example.com"
                         required
-                        style="width: 100%; margin-top: 0.5rem;"
+                        class="form-control"
                     >
                 </div>
 
@@ -126,7 +126,7 @@ require_once __DIR__ . '/../includes/header.php';
                         name="subject" 
                         maxlength="150"
                         placeholder="What is this regarding?"
-                        style="width: 100%; margin-top: 0.5rem;"
+                        class="form-control"
                     >
                 </div>
 
@@ -138,12 +138,12 @@ require_once __DIR__ . '/../includes/header.php';
                         maxlength="2000"
                         placeholder="How can we help you today?"
                         required
-                        style="width: 100%; margin-top: 0.5rem;"
+                        class="form-control"
                     ></textarea>
                 </div>
 
                 <div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem;">
+                    <button type="submit" class="btn btn-primary full-width">
                         Send Message <span>→</span>
                     </button>
                 </div>

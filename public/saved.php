@@ -35,10 +35,10 @@ require_once __DIR__ . '/../includes/header.php';
     <?php if (empty($savedSkills)): ?>
         <div class="empty-state">
             <p>Your wishlist is currently empty.</p>
-            <p style="margin-top: 0.5rem; color: var(--text-muted);">
+            <p class="mt-1 text-muted">
                 Browse skills across the platform and tap "Save for Later" to bookmark them here.
             </p>
-            <p style="margin-top: 1rem;"><a href="/main/public/browse.php" class="btn btn-primary">Browse Skills</a></p>
+            <p class="mt-3"><a href="/main/public/browse.php" class="btn btn-primary">Browse Skills</a></p>
         </div>
     <?php else: ?>
         <div class="saved-grid">
@@ -47,7 +47,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div>
                         <div class="saved-card-top">
                             <span class="skill-cat-pill"><?php echo htmlspecialchars($skill['category']); ?></span>
-                            <span style="color: var(--primary-color); font-size: 1.1rem;">★</span>
+                            <span class="favorite-mark">★</span>
                         </div>
                         <h3>
                             <a href="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
@@ -60,13 +60,13 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
 
                     <div class="saved-card-actions">
-                        <a href="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>" class="btn btn-primary" style="padding: 0.45rem 1rem; font-size: 0.85rem;">
+                        <a href="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>" class="btn btn-primary btn-sm">
                             View Details <span>→</span>
                         </a>
                         <form method="POST" action="/main/actions/skill_unsave.php" class="inline-form">
                             <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
                             <input type="hidden" name="return_to" value="/main/public/saved.php">
-                            <button type="submit" class="btn btn-decline" style="padding: 0.45rem 0.9rem; font-size: 0.85rem;" data-confirm="Remove this skill from your saved list?">
+                            <button type="submit" class="btn btn-decline btn-sm-narrow" data-confirm="Remove this skill from your saved list?">
                                 Unsave
                             </button>
                         </form>

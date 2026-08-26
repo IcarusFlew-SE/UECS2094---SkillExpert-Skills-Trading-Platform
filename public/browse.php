@@ -78,7 +78,7 @@ require_once __DIR__ . '/../includes/header.php';
         <?php if (empty($skills)): ?>
             <div class="empty-state">
                 <p>No skills have been listed on SkillExpert yet.</p>
-                <p style="margin-top: 0.5rem;"><a href="/main/public/posting.php">Post the first skill and start exchanging!</a></p>
+                <p class="mt-1"><a href="/main/public/posting.php">Post the first skill and start exchanging!</a></p>
             </div>
         <?php else: ?>
             <div class="browse-grid" id="skills-grid">
@@ -128,9 +128,9 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php endforeach; ?>
             </div>
 
-            <div id="browse-no-results" class="empty-state" style="display: none; margin-top: 2rem;">
+            <div id="browse-no-results" class="empty-state is-hidden mt-4">
                 <p>No skills matched your search filter.</p>
-                <p style="margin-top: 0.5rem;"><small>Try searching with another keyword or selecting "All" categories.</small></p>
+                <p class="mt-1"><small>Try searching with another keyword or selecting "All" categories.</small></p>
             </div>
         <?php endif; ?>
 

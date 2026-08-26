@@ -17,6 +17,8 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <title><?php echo htmlspecialchars($pageTitle ?? 'SkillExpert'); ?></title>
     <link rel="icon" type="image/png" href="/main/assets/img/logo-icon-dark.png">
     <link rel="stylesheet" href="/main/assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/style.css'); ?>">
+    <link rel="stylesheet" href="/main/assets/css/layout.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/layout.css'); ?>">
+    <link rel="stylesheet" href="/main/assets/css/components.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/components.css'); ?>">
 </head>
 <body>
 

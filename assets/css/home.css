@@ -556,3 +556,7 @@
         margin: 0 auto;
     }
 }
+
+.featured-skills-section { margin-top: 1rem; }
+.home-section-heading h2 { font-size: 2.2rem; font-weight: 800; margin-top: 0.75rem; letter-spacing: -0.03em; }
+.home-section-heading p { color: var(--text-secondary); margin-top: 0.5rem; }

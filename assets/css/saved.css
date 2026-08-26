@@ -88,3 +88,20 @@
     border-top: 1px solid var(--border-color);
     gap: 0.5rem;
 }
+
+/* Post-a-Skill aligned module polish */
+.saved-page-header {
+    padding: 3rem 2rem;
+    border-radius: 28px;
+    background: var(--module-hero-bg);
+    color: #ffffff;
+    box-shadow: 0 24px 70px rgba(17, 12, 32, 0.28);
+}
+
+.saved-page-header h1 {
+    color: #ffffff;
+}
+
+.saved-page-header p {
+    color: #d8ccff;
+}

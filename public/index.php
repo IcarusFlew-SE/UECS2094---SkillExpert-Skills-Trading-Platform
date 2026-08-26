@@ -88,7 +88,7 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="container">
 
         <!-- Featured Skills Section -->
-        <section class="featured-skills-section" style="margin-top: 1rem;">
+        <section class="featured-skills-section">
             <div class="section-head-wrap">
                 <div>
                     <h2>Featured Skills</h2>
@@ -102,7 +102,7 @@ require_once __DIR__ . '/../includes/header.php';
             <?php if (empty($featuredSkills)): ?>
                 <div class="empty-state">
                     <p>No skills have been posted yet.</p>
-                    <p style="margin-top: 0.5rem;"><a href="/main/public/posting.php">Be the first to post a skill and kick off the community!</a></p>
+                    <p class="mt-1"><a href="/main/public/posting.php">Be the first to post a skill and kick off the community!</a></p>
                 </div>
             <?php else: ?>
                 <div class="skills-grid">
@@ -140,10 +140,10 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- How It Works 3-Step Section -->
         <section class="home-how-it-works">
-            <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+            <div class="center-narrow home-section-heading">
                 <span class="skill-cat-pill">Simple 3 Steps</span>
-                <h2 style="font-size: 2.2rem; font-weight: 800; margin-top: 0.75rem; letter-spacing: -0.03em;">How Skill Trading Works</h2>
-                <p style="color: var(--text-secondary); margin-top: 0.5rem;">No transaction fees, no payments. Just mutual learning.</p>
+                <h2>How Skill Trading Works</h2>
+                <p>No transaction fees, no payments. Just mutual learning.</p>
             </div>
 
             <div class="how-steps-grid">
@@ -169,7 +169,7 @@ require_once __DIR__ . '/../includes/header.php';
         <section class="home-cta-banner">
             <h2>Ready to start trading skills?</h2>
             <p>Join our community today and turn your talents into endless learning opportunities.</p>
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <div class="inline-actions">
                 <?php if (!isset($_SESSION['user_id'])): ?>
                     <a href="/main/auth/register.php" class="btn-hero-primary">Create Your Free Account</a>
                     <a href="/main/public/browse.php" class="btn-hero-secondary">Explore Skills</a>
