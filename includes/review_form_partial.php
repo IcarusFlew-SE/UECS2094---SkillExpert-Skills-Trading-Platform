@@ -14,24 +14,39 @@
  */
 
 $alreadyReviewed = userHasReviewed($pdo, (int) $swap['id'], $currentUserId);
+$isRequesterView = isset($swap['requesterId']) && (int) $swap['requesterId'] === $currentUserId;
+$reviewPartnerName = $isRequesterView
+    ? ($swap['receiverName'] ?? 'your teacher')
+    : ($swap['requesterName'] ?? 'your learner');
+$returnTo = $_SERVER['REQUEST_URI'] ?? '/main/public/swaps.php';
+
+if (!str_starts_with($returnTo, '/main/public/swaps.php') && !str_starts_with($returnTo, '/main/public/teaching_requests.php')) {
+    $returnTo = '/main/public/swaps.php';
+}
 ?>
-<div class="review-partial">
+<div class="review-partial" id="review-swap-<?php echo (int) $swap['id']; ?>">
+    <div class="review-callout-header">
+        <div>
+            <p class="review-eyebrow">Completed swap</p>
+            <h4>Share how the lesson went</h4>
+        </div>
+        <a href="/main/public/details.php?id=<?php echo (int) $swap['skillId']; ?>#reviews" class="review-details-link">View skill reviews</a>
+    </div>
+
     <?php if ($alreadyReviewed): ?>
-        <p class="review-done">✓ You've already reviewed this swap. See it on the skill's details page.</p>
+        <p class="review-done">✓ You've already reviewed this swap. Your feedback now appears on the skill's details page.</p>
     <?php else: ?>
+        <p class="review-helper-text">
+            Leave a verified peer review for <strong><?php echo htmlspecialchars($reviewPartnerName); ?></strong>. Reviews unlock only after a completed exchange, so future students can trust the feedback.
+        </p>
         <form method="POST" action="/main/actions/review_submit.php" class="review-form">
             <input type="hidden" name="swap_id" value="<?php echo (int) $swap['id']; ?>">
+            <input type="hidden" name="return_to" value="<?php echo htmlspecialchars($returnTo); ?>">
 
             <fieldset class="star-rating" role="radiogroup" aria-label="Rating">
                 <legend>Rate this swap</legend>
-                <?php
-                // Rendered 5 -> 1 in the markup (source order) but visually
-                // reversed with CSS so that clicking a star also highlights
-                // every star before it — a pure-CSS star-rating widget,
-                // no JS required for the visual, JS only adds a submit guard.
-                for ($i = 5; $i >= 1; $i--):
-                    $inputId = 'star-' . $swap['id'] . '-' . $i;
-                    ?>
+                <?php for ($i = 5; $i >= 1; $i--): ?>
+                    <?php $inputId = 'star-' . $swap['id'] . '-' . $i; ?>
                     <input type="radio" name="rating" id="<?php echo $inputId; ?>" value="<?php echo $i; ?>" required>
                     <label for="<?php echo $inputId; ?>" title="<?php echo $i; ?> star<?php echo $i > 1 ? 's' : ''; ?>">★</label>
                 <?php endfor; ?>
@@ -42,11 +57,14 @@ $alreadyReviewed = userHasReviewed($pdo, (int) $swap['id'], $currentUserId);
                 name="comment"
                 id="comment-<?php echo $swap['id']; ?>"
                 maxlength="1000"
-                rows="2"
-                placeholder="How did the swap go? (optional)"
+                rows="3"
+                placeholder="What did you learn, teach, or appreciate about this swap? (optional)"
             ></textarea>
 
-            <button type="submit" class="btn btn-accept">Submit Review</button>
+            <div class="review-submit-row">
+                <button type="submit" class="btn btn-accept">Submit Verified Review</button>
+                <span class="review-microcopy">Helps keep SwapExpert community-led, not marketplace-led.</span>
+            </div>
         </form>
     <?php endif; ?>
 </div>

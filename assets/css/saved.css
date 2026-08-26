@@ -133,3 +133,8 @@
         flex-direction: column;
     }
 }
+
+.deletion-impact-note {
+    color: #9a3412;
+    font-weight: 700;
+}

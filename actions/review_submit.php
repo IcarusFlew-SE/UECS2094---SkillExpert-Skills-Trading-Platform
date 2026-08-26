@@ -20,9 +20,24 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/swap_functions.php';
 
 $currentUserId = (int) $_SESSION['user_id'];
+$redirectTarget = '/main/public/swaps.php';
+
+if (isset($_POST['return_to']) && is_string($_POST['return_to'])) {
+    $postedReturnTo = $_POST['return_to'];
+    $allowedPrefixes = [
+        '/main/public/swaps.php',
+        '/main/public/teaching_requests.php',
+    ];
+    foreach ($allowedPrefixes as $prefix) {
+        if (str_starts_with($postedReturnTo, $prefix)) {
+            $redirectTarget = $postedReturnTo;
+            break;
+        }
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: /main/public/swaps.php");
+    header("Location: $redirectTarget");
     exit;
 }
 
@@ -36,7 +51,7 @@ if (strlen($comment) > 1000) {
 
 if (!$swapId || !$rating || $rating < 1 || $rating > 5) {
     setFlash('error', 'Please choose a rating between 1 and 5 stars.');
-    header("Location: /main/public/swaps.php");
+    header("Location: $redirectTarget");
     exit;
 }
 
@@ -44,7 +59,7 @@ $swap = getSwapById($pdo, $swapId);
 
 if (!$swap) {
     setFlash('error', 'That swap no longer exists.');
-    header("Location: /main/public/swaps.php");
+    header("Location: $redirectTarget");
     exit;
 }
 
@@ -53,19 +68,19 @@ $isParticipant = ((int) $swap['requesterId'] === $currentUserId
 
 if (!$isParticipant) {
     setFlash('error', "You weren't part of that swap.");
-    header("Location: /main/public/swaps.php");
+    header("Location: $redirectTarget");
     exit;
 }
 
 if ($swap['status'] !== 'completed') {
     setFlash('error', 'You can only review a swap after it has been completed.');
-    header("Location: /main/public/swaps.php");
+    header("Location: $redirectTarget");
     exit;
 }
 
 if (userHasReviewed($pdo, $swapId, $currentUserId)) {
     setFlash('error', "You've already reviewed this swap.");
-    header("Location: /main/public/swaps.php");
+    header("Location: $redirectTarget");
     exit;
 }
 
@@ -84,5 +99,5 @@ try {
     }
 }
 
-header("Location: /main/public/swaps.php");
+header("Location: $redirectTarget");
 exit;

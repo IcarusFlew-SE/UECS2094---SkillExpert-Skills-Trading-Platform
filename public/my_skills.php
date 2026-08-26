@@ -25,6 +25,7 @@ if ($editingId) {
 $stmt = $pdo->prepare(
     "SELECT sk.*,
             COUNT(DISTINCT sr.id) AS requestCount,
+            COUNT(DISTINCT CASE WHEN sr.status IN ('pending', 'accepted') THEN sr.id END) AS activeRequestCount,
             COUNT(DISTINCT ss.id) AS savedCount
      FROM skills sk
      LEFT JOIN swapRequests sr ON sr.skillId = sk.id
@@ -102,13 +103,16 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                         <h3><a href="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>"><?php echo htmlspecialchars($skill['title']); ?></a></h3>
                         <p class="saved-card-meta"><?php echo htmlspecialchars(mb_strimwidth($skill['description'], 0, 140, '...')); ?></p>
-                        <p class="saved-card-meta"><?php echo (int) $skill['requestCount']; ?> swap request(s)</p>
+                        <p class="saved-card-meta"><?php echo (int) $skill['requestCount']; ?> swap request(s), <?php echo (int) $skill['activeRequestCount']; ?> active</p>
+                        <?php if ((int) $skill['activeRequestCount'] > 0 || (int) $skill['savedCount'] > 0): ?>
+                            <p class="saved-card-meta deletion-impact-note">Deleting removes this listing from browse/details, clears saves, and closes related requests.</p>
+                        <?php endif; ?>
                     </div>
                     <div class="saved-card-actions">
                         <a href="/main/public/my_skills.php?edit=<?php echo (int) $skill['id']; ?>#edit-skill" class="btn btn-primary btn-sm">Edit</a>
                         <form method="POST" action="/main/actions/skill_delete.php" class="inline-form">
                             <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
-                            <button type="submit" class="btn btn-decline btn-sm-narrow" data-confirm="Delete this skill and related swaps, comments, reviews, and saves?">Delete</button>
+                            <button type="submit" class="btn btn-decline btn-sm-narrow" data-confirm="Delete this skill permanently? This removes it for other users too, including saved entries, comments, reviews, and related swap requests.">Delete</button>
                         </form>
                     </div>
                 </article>

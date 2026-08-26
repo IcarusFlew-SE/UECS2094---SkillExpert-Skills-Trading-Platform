@@ -20,9 +20,21 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/swap_functions.php';
 
 $currentUserId = (int) $_SESSION['user_id'];
+$redirectTarget = '/main/public/swaps.php';
+
+if (isset($_POST['redirect_to']) && is_string($_POST['redirect_to'])) {
+    $postedRedirect = $_POST['redirect_to'];
+    $allowedRedirects = [
+        '/main/public/swaps.php',
+        '/main/public/teaching_requests.php',
+    ];
+    if (in_array($postedRedirect, $allowedRedirects, true)) {
+        $redirectTarget = $postedRedirect;
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: /main/public/swaps.php");
+    header("Location: {$redirectTarget}");
     exit;
 }
 
@@ -32,7 +44,7 @@ $allowedActions = ['accept', 'decline', 'cancel', 'complete'];
 
 if (!$swapId || !in_array($action, $allowedActions, true)) {
     setFlash('error', 'Invalid request.');
-    header("Location: /main/public/swaps.php");
+    header("Location: {$redirectTarget}");
     exit;
 }
 
@@ -40,7 +52,7 @@ $swap = getSwapById($pdo, $swapId);
 
 if (!$swap) {
     setFlash('error', 'That swap request no longer exists.');
-    header("Location: /main/public/swaps.php");
+    header("Location: {$redirectTarget}");
     exit;
 }
 
@@ -50,7 +62,7 @@ $isReceiver  = ((int) $swap['receiverId'] === $currentUserId);
 // Not one of the two participants at all — nothing to do with this row.
 if (!$isRequester && !$isReceiver) {
     setFlash('error', "You don't have permission to update that request.");
-    header("Location: /main/public/swaps.php");
+    header("Location: {$redirectTarget}");
     exit;
 }
 
@@ -104,7 +116,7 @@ switch ($action) {
 
 if ($newStatus === null) {
     setFlash('error', $errorMsg ?? 'Unable to update that request.');
-    header("Location: /main/public/swaps.php");
+    header("Location: {$redirectTarget}");
     exit;
 }
 
@@ -121,5 +133,5 @@ if ($newStatus === 'completed') {
 }
 
 setFlash('success', $successMsg);
-header("Location: /main/public/swaps.php");
+header("Location: {$redirectTarget}");
 exit;

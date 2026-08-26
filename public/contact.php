@@ -70,7 +70,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="contact-method-icon">📍</div>
                     <div class="contact-method-detail">
                         <strong>Location</strong>
-                        <span>Universiti Tunku Abdul Rahman, Kampar Campus, Perak, Malaysia</span>
+                        <span>Universiti Tunku Abdul Rahman, Malaysia</span>
                     </div>
                 </div>
             </div>
