@@ -1,0 +1,382 @@
+/* ==========================================
+   SkillExpert - Skill Details Stylesheet
+   Theme: Lavender & Royal Violet
+   ========================================== */
+
+.details-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+}
+
+/* --- Breadcrumb Back Link --- */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    transition: var(--transition);
+}
+
+.back-link:hover {
+    color: var(--primary-color);
+    transform: translateX(-4px);
+}
+
+/* --- Main Skill Card --- */
+.skill-detail-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.skill-detail-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light), var(--secondary-color));
+}
+
+.skill-detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.skill-category-tag {
+    display: inline-block;
+    background-color: var(--primary-soft);
+    color: var(--primary-hover);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.85rem;
+    border-radius: 9999px;
+    border: 1px solid var(--lavender-200);
+    margin-bottom: 0.85rem;
+}
+
+.skill-detail-card h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.85rem;
+}
+
+.skill-teacher-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.teacher-avatar-lg {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.teacher-info-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.teacher-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.teacher-name-lg {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.skill-description-box {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: 1.75rem;
+}
+
+.skill-rating-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #92400e;
+}
+
+.stars {
+    color: var(--accent-gold);
+    letter-spacing: 2px;
+}
+
+/* --- Save/Bookmark Action --- */
+.save-action-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* --- Form Cards & Sections --- */
+.detail-section-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 2.25rem;
+    box-shadow: var(--shadow-sm);
+    margin-top: 2rem;
+}
+
+.detail-section-card h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- Swap Request Form --- */
+.swap-request-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+}
+
+.swap-request-form label,
+.comment-form label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: -0.4rem;
+}
+
+.swap-request-form select,
+.swap-request-form textarea,
+.comment-form textarea,
+.review-form textarea {
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font: inherit;
+    font-size: 0.95rem;
+    background: #fafafa;
+    transition: var(--transition);
+}
+
+.swap-request-form select:focus,
+.swap-request-form textarea:focus,
+.comment-form textarea:focus,
+.review-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: #ffffff;
+    box-shadow: 0 0 0 4px var(--primary-glow-subtle);
+}
+
+.swap-request-form textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+/* --- Review List --- */
+.review-list,
+.comment-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.review-item {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    transition: var(--transition);
+}
+
+.review-item:hover {
+    border-color: var(--lavender-200);
+    box-shadow: var(--shadow-sm);
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.review-reviewer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.review-date {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+.review-comment {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* --- Star Rating Widget --- */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.star-rating legend {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+}
+
+.star-rating input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.star-rating label {
+    font-size: 1.8rem;
+    line-height: 1;
+    color: #cbd5e1;
+    cursor: pointer;
+    padding: 0 0.1rem;
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: var(--accent-gold);
+}
+
+.star-rating label:hover {
+    transform: scale(1.15);
+}
+
+/* --- Comments Section --- */
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.comment-form textarea {
+    min-height: 85px;
+    resize: vertical;
+}
+
+.comment-item {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    position: relative;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.comment-author-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.comment-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--lavender-200);
+    color: var(--primary-hover);
+    font-weight: 800;
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comment-author {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--text-primary);
+}
+
+.comment-date {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.comment-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.comment-actions {
+    margin-top: 0.5rem;
+    text-align: right;
+}

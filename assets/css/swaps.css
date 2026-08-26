@@ -1,0 +1,186 @@
+/* ==========================================
+   SkillExpert - My Swaps Stylesheet
+   Theme: Lavender & Royal Violet
+   ========================================== */
+
+.swaps-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+}
+
+.swaps-page-header {
+    margin-bottom: 2rem;
+}
+
+.swaps-page-header h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.swaps-page-header p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+/* --- Tabs Switcher --- */
+.swaps-tabs {
+    margin-top: 2rem;
+}
+
+.swap-tab-radio {
+    display: none;
+}
+
+.swap-tab-labels {
+    display: flex;
+    gap: 0.75rem;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.swap-tab-labels label {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.swap-tab-labels label:hover {
+    color: var(--primary-color);
+}
+
+#tab-received:checked ~ .swap-tab-labels label[for="tab-received"],
+#tab-sent:checked ~ .swap-tab-labels label[for="tab-sent"] {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.swap-tab-panel {
+    display: none;
+    animation: tabFadeIn 0.3s ease;
+}
+
+#tab-received:checked ~ #panel-received,
+#tab-sent:checked ~ #panel-sent {
+    display: block;
+}
+
+@keyframes tabFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Swap Card --- */
+.swap-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.swap-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--lavender-300);
+}
+
+.swap-card-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.swap-card h3 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.35rem;
+}
+
+.swap-meta {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    margin-bottom: 0.75rem;
+}
+
+.swap-meta strong {
+    color: var(--text-primary);
+}
+
+.swap-offer-box {
+    background: var(--primary-soft);
+    border: 1px solid var(--lavender-200);
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    color: var(--primary-hover);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.swap-message-bubble {
+    background: #f8fafc;
+    border-left: 3px solid var(--primary-light);
+    padding: 0.75rem 1rem;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.swap-actions {
+    display: flex;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+/* --- Review partial inside completed swap --- */
+.review-partial {
+    margin-top: 1.25rem;
+    border-top: 1px dashed var(--lavender-300);
+    padding-top: 1.25rem;
+    background: #fafafa;
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+}
+
+.review-done {
+    color: #15803d;
+    font-size: 0.92rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 500px;
+}

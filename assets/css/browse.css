@@ -1,0 +1,277 @@
+/* ==========================================
+   SkillExpert - Browse Skills Stylesheet
+   Theme: Lavender & Royal Violet
+   ========================================== */
+
+.browse-page {
+    padding-bottom: 5rem;
+}
+
+/* --- Browse Hero Banner --- */
+.browse-hero {
+    background: radial-gradient(circle at 50% 0%, #2e1065 0%, #09090b 80%);
+    color: #ffffff;
+    padding: 3.5rem 1.5rem 3rem;
+    text-align: center;
+    border-bottom: 1px solid #27272a;
+    position: relative;
+    overflow: hidden;
+}
+
+.browse-hero-content {
+    max-width: 750px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.browse-hero h1 {
+    font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.75rem;
+}
+
+.browse-hero h1 span {
+    background: linear-gradient(135deg, #c4b5fd, #8b5cf6, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.browse-hero p {
+    font-size: 1.05rem;
+    color: #cbd5e1;
+    margin-bottom: 2rem;
+}
+
+/* --- Search Bar --- */
+.browse-search-box {
+    position: relative;
+    max-width: 580px;
+    margin: 0 auto;
+}
+
+.browse-search-input {
+    width: 100%;
+    padding: 0.95rem 1.25rem 0.95rem 3rem;
+    background: rgba(24, 24, 27, 0.9);
+    border: 1px solid #3f3f46;
+    border-radius: 9999px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.browse-search-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    background: #18181b;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.25), 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.browse-search-icon {
+    position: absolute;
+    left: 1.15rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a78bfa;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+/* --- Category Filter Bar --- */
+.category-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    overflow-x: auto;
+    padding: 1.75rem 0 1rem;
+    margin-bottom: 2rem;
+    scrollbar-width: none;
+}
+
+.category-filter-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-pill {
+    padding: 0.55rem 1.15rem;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 9999px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-pill:hover {
+    border-color: var(--primary-light);
+    color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.filter-pill.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+    transform: translateY(-2px);
+}
+
+/* --- Skills Catalog Grid --- */
+.browse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 1.75rem;
+}
+
+.browse-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.browse-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.browse-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px -6px rgba(139, 92, 246, 0.16), 0 4px 12px rgba(15, 23, 42, 0.05);
+    border-color: var(--lavender-300);
+}
+
+.browse-card:hover::before {
+    opacity: 1;
+}
+
+.browse-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.browse-card-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.35;
+    margin-bottom: 0.65rem;
+}
+
+.browse-card-title a {
+    color: var(--text-primary);
+}
+
+.browse-card-title a:hover {
+    color: var(--primary-color);
+}
+
+.browse-card-desc {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    margin-bottom: 1.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.browse-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1.15rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.browse-teacher-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.browse-teacher-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-soft), var(--lavender-200));
+    color: var(--primary-hover);
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--lavender-300);
+}
+
+.browse-teacher-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.browse-teacher-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.browse-view-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    background: var(--primary-soft);
+    color: var(--primary-hover);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.2s ease;
+}
+
+.browse-card:hover .browse-view-btn {
+    background: var(--primary-color);
+    color: #ffffff;
+    transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.browse-count-label {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* --- Card Hide for Filter --- */
+.browse-card.is-hidden {
+    display: none;
+}

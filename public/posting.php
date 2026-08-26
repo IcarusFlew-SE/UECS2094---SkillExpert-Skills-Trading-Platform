@@ -8,9 +8,9 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
 ?>
 
-<link rel="stylesheet" href="../assets/css/skills-posting.css">
+<link rel="stylesheet" href="/main/assets/css/skills-posting.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/skills-posting.css'); ?>">
 
-<main class="post-skill-page">
+<div class="post-skill-page">
 
     <?php if (isset($_GET['published']) && $_GET['published'] === '1'): ?>
 
@@ -649,8 +649,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
 
     </section>
-
-</main>
+</div>
 
 
 <script src="../assets/js/skills-posting.js"></script>

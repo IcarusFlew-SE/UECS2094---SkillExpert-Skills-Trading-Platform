@@ -1,18 +1,7 @@
 <?php
 /**
- * Item Details Page — one skill listing in full, plus (Barry's part):
- * a "Request a Swap" form, the reviews left for this skill, and its
- * comment thread.
- *
- * NOTE TO TEAMMATE (skills domain): the block marked
- * "SKILL INFO — placeholder" below is intentionally minimal — title,
- * category, description, teacher name and an image slot. Feel free to
- * replace/extend it (gallery, tags, richer layout, etc.) — just keep the
- * $skill array shape (id, title, category, description, imagePath, userId,
- * teacherName) and the #skill-id anchor around it, since the swap/review/
- * comment sections below rely on $skill['id'] being resolved before they run.
- *
- * GET param: id (skill id)
+ * Item Details Page — skill listing in full, swap request form,
+ * verified reviews, comments discussion, and save/bookmark toggle.
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -72,163 +61,231 @@ if ($skill) {
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<section class="container details-page">
+<link rel="stylesheet" href="/main/assets/css/details.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/details.css'); ?>">
+
+<div class="details-page">
+
+    <a href="/main/public/browse.php" class="back-link">
+        ← Back to Browse Skills
+    </a>
 
     <?php if ($flash): ?>
-        <p class="flash-msg flash-<?php echo htmlspecialchars($flash['type']); ?>">
+        <div class="flash-msg flash-<?php echo htmlspecialchars($flash['type']); ?>">
             <?php echo htmlspecialchars($flash['text']); ?>
-        </p>
+        </div>
     <?php endif; ?>
 
     <?php if (!$skill): ?>
-        <p class="empty-state">Skill not found. <a href="/main/public/browse.php">Back to Browse</a></p>
-
+        <div class="empty-state">
+            <h2>Skill Not Found</h2>
+            <p style="margin-top: 0.5rem;">The skill listing you requested might have been removed or does not exist.</p>
+            <p style="margin-top: 1rem;"><a href="/main/public/browse.php" class="btn btn-primary">Browse Available Skills</a></p>
+        </div>
     <?php else: ?>
 
-        <!-- ===================== SKILL INFO — placeholder ===================== -->
+        <!-- ===================== SKILL INFO HERO CARD ===================== -->
         <article class="skill-detail-card" id="skill-<?php echo (int) $skill['id']; ?>">
-            <p class="skill-category-tag"><?php echo htmlspecialchars($skill['category']); ?></p>
-            <h1><?php echo htmlspecialchars($skill['title']); ?></h1>
-            <p class="skill-teacher">Taught by <strong><?php echo htmlspecialchars($skill['teacherName']); ?></strong></p>
-            <p class="skill-description"><?php echo nl2br(htmlspecialchars($skill['description'])); ?></p>
-            <?php if (!empty($ratingSummary['reviewCount'])): ?>
-                <p class="skill-rating-summary">
-                    <span class="stars" aria-hidden="true"><?php echo renderStars((int) round($ratingSummary['avgRating'])); ?></span>
-                    <?php echo htmlspecialchars((string) $ratingSummary['avgRating']); ?> / 5
-                    (<?php echo (int) $ratingSummary['reviewCount']; ?> review<?php echo $ratingSummary['reviewCount'] === 1 ? '' : 's'; ?>)
-                </p>
-            <?php endif; ?>
-        </article>
-        <!-- =================== END SKILL INFO — placeholder =================== -->
+            <div class="skill-detail-header">
+                <div>
+                    <span class="skill-category-tag"><?php echo htmlspecialchars($skill['category']); ?></span>
+                    <h1><?php echo htmlspecialchars($skill['title']); ?></h1>
+                </div>
 
-        <!-- ===================== Save / Unsave (Barry) ===================== -->
-        <?php if ($isLoggedIn && !$isOwner): ?>
-            <div class="save-action">
-                <?php if ($isSaved): ?>
-                    <form method="POST" action="/main/actions/skill_unsave.php" class="inline-form">
-                        <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
-                        <input type="hidden" name="return_to" value="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
-                        <button type="submit" class="btn btn-decline">★ Saved — remove</button>
-                    </form>
-                <?php else: ?>
-                    <form method="POST" action="/main/actions/skill_save.php" class="inline-form">
-                        <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
-                        <button type="submit" class="btn btn-accept">☆ Save for later</button>
-                    </form>
+                <!-- Save / Bookmark Button -->
+                <?php if ($isLoggedIn && !$isOwner): ?>
+                    <div class="save-action-bar">
+                        <?php if ($isSaved): ?>
+                            <form method="POST" action="/main/actions/skill_unsave.php" class="inline-form">
+                                <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
+                                <input type="hidden" name="return_to" value="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
+                                <button type="submit" class="btn btn-decline" title="Remove from your saved list">
+                                    ★ Saved in Wishlist
+                                </button>
+                            </form>
+                        <?php else: ?>
+                            <form method="POST" action="/main/actions/skill_save.php" class="inline-form">
+                                <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
+                                <button type="submit" class="btn btn-ghost" title="Save this skill for later">
+                                    ☆ Save for Later
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
                 <?php endif; ?>
             </div>
-        <?php endif; ?>
-        <!-- =================== END Save / Unsave (Barry) =================== -->
 
-        <!-- ===================== Request a Swap (Barry) ===================== -->
-        <section class="request-swap-section">
+            <div class="skill-teacher-bar">
+                <div class="teacher-avatar-lg">
+                    <?php echo htmlspecialchars(mb_substr($skill['teacherName'], 0, 1)); ?>
+                </div>
+                <div class="teacher-info-wrap">
+                    <span class="teacher-label">Taught by</span>
+                    <span class="teacher-name-lg"><?php echo htmlspecialchars($skill['teacherName']); ?></span>
+                </div>
+                <?php if (!empty($ratingSummary['reviewCount'])): ?>
+                    <div class="skill-rating-summary" style="margin-left: auto;">
+                        <span class="stars" aria-hidden="true"><?php echo renderStars((int) round($ratingSummary['avgRating'])); ?></span>
+                        <span><?php echo htmlspecialchars((string) $ratingSummary['avgRating']); ?> / 5 (<?php echo (int) $ratingSummary['reviewCount']; ?>)</span>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="skill-description-box">
+                <p><?php echo nl2br(htmlspecialchars($skill['description'])); ?></p>
+            </div>
+        </article>
+
+        <!-- ===================== Request a Swap Section ===================== -->
+        <section class="detail-section-card">
+            <h2>⇄ Propose a Skill Swap</h2>
+
             <?php if ($isOwner): ?>
-                <p class="info-note">This is your own listing — manage requests for it from <a href="/main/public/swaps.php">My Swaps</a>.</p>
+                <div class="empty-state" style="padding: 1.5rem;">
+                    <p>This is your own skill listing. You can manage incoming requests from your <a href="/main/public/swaps.php">My Swaps</a> dashboard.</p>
+                </div>
             <?php elseif (!$isLoggedIn): ?>
-                <p class="info-note"><a href="/main/auth/login.php">Log in</a> to request a swap for this skill.</p>
+                <div class="empty-state" style="padding: 1.5rem;">
+                    <p>Want to learn this skill? <a href="/main/auth/login.php">Log in</a> or <a href="/main/auth/register.php">create an account</a> to propose a skill exchange with <?php echo htmlspecialchars($skill['teacherName']); ?>.</p>
+                </div>
             <?php else: ?>
-                <h2>Request a Swap</h2>
                 <form method="POST" action="/main/actions/swap_request_create.php" class="swap-request-form">
                     <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
 
-                    <?php if (!empty($myOwnSkills)): ?>
+                    <div>
                         <label for="offered-skill">Offer one of your skills in exchange (optional)</label>
-                        <select name="offered_skill_id" id="offered-skill">
-                            <option value="">— No specific skill offered —</option>
-                            <?php foreach ($myOwnSkills as $mySkill): ?>
-                                <option value="<?php echo (int) $mySkill['id']; ?>">
-                                    <?php echo htmlspecialchars($mySkill['title']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    <?php else: ?>
-                        <p class="info-note-small">You haven't posted any skills yet, but you can still send a request.</p>
-                    <?php endif; ?>
+                        <?php if (!empty($myOwnSkills)): ?>
+                            <select name="offered_skill_id" id="offered-skill" style="width: 100%; margin-top: 0.5rem;">
+                                <option value="">— No specific skill offered (open exchange) —</option>
+                                <?php foreach ($myOwnSkills as $mySkill): ?>
+                                    <option value="<?php echo (int) $mySkill['id']; ?>">
+                                        <?php echo htmlspecialchars($mySkill['title']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php else: ?>
+                            <p class="info-note-small" style="margin-top: 0.25rem;">
+                                You haven't posted any skills yet, but you can still send an exchange request!
+                            </p>
+                        <?php endif; ?>
+                    </div>
 
-                    <label for="swap-message">Message (optional)</label>
-                    <textarea name="message" id="swap-message" maxlength="500" rows="3"
-                              placeholder="Introduce yourself and say why you'd like this swap..."></textarea>
+                    <div>
+                        <label for="swap-message">Message to Teacher</label>
+                        <textarea 
+                            name="message" 
+                            id="swap-message" 
+                            maxlength="500" 
+                            placeholder="Introduce yourself and explain what you'd like to learn or how you can collaborate..." 
+                            style="width: 100%; margin-top: 0.5rem;"
+                        ></textarea>
+                    </div>
 
-                    <button type="submit" class="btn btn-primary">Send Swap Request</button>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            Send Swap Request <span>→</span>
+                        </button>
+                    </div>
                 </form>
             <?php endif; ?>
         </section>
-        <!-- =================== END Request a Swap (Barry) =================== -->
 
-        <!-- ===================== Reviews (Barry) ===================== -->
-        <section class="reviews-section" id="reviews">
-            <h2>Reviews</h2>
+        <!-- ===================== Reviews Section ===================== -->
+        <section class="detail-section-card" id="reviews">
+            <h2>★ Verified Reviews</h2>
+
             <?php if (empty($reviews)): ?>
-                <p class="empty-state">No reviews yet — reviews appear here once a swap for this skill is completed.</p>
+                <div class="empty-state" style="padding: 1.5rem;">
+                    <p>No reviews yet. Reviews are unlocked once members complete an exchange for this skill.</p>
+                </div>
             <?php else: ?>
                 <ul class="review-list">
                     <?php foreach ($reviews as $review): ?>
                         <li class="review-item">
-                            <p class="review-header">
-                                <span class="stars" aria-hidden="true"><?php echo renderStars((int) $review['rating']); ?></span>
-                                <strong><?php echo htmlspecialchars($review['reviewerName']); ?></strong>
+                            <div class="review-header">
+                                <div class="review-reviewer">
+                                    <span class="stars" aria-hidden="true"><?php echo renderStars((int) $review['rating']); ?></span>
+                                    <span><?php echo htmlspecialchars($review['reviewerName']); ?></span>
+                                </div>
                                 <span class="review-date"><?php echo htmlspecialchars(date('d M Y', strtotime($review['createdAt']))); ?></span>
-                            </p>
+                            </div>
                             <?php if (!empty($review['comment'])): ?>
                                 <p class="review-comment"><?php echo nl2br(htmlspecialchars($review['comment'])); ?></p>
                             <?php endif; ?>
                             <?php if ($isLoggedIn && (int) $review['userId'] === $currentUserId): ?>
-                                <form method="POST" action="/main/actions/review_delete.php" class="inline-form">
-                                    <input type="hidden" name="review_id" value="<?php echo (int) $review['id']; ?>">
-                                    <input type="hidden" name="return_to" value="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
-                                    <button type="submit" class="btn-link-danger" data-confirm="Delete your review?">Delete</button>
-                                </form>
+                                <div style="margin-top: 0.5rem; text-align: right;">
+                                    <form method="POST" action="/main/actions/review_delete.php" class="inline-form">
+                                        <input type="hidden" name="review_id" value="<?php echo (int) $review['id']; ?>">
+                                        <input type="hidden" name="return_to" value="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
+                                        <button type="submit" class="btn-link-danger" data-confirm="Delete your review?">Delete Review</button>
+                                    </form>
+                                </div>
                             <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
         </section>
-        <!-- =================== END Reviews (Barry) =================== -->
 
-        <!-- ===================== Comments (Barry) ===================== -->
-        <section class="comments-section" id="comments">
-            <h2>Comments (<?php echo count($comments); ?>)</h2>
+        <!-- ===================== Comments Discussion ===================== -->
+        <section class="detail-section-card" id="comments">
+            <h2>💬 Discussion & Questions (<?php echo count($comments); ?>)</h2>
 
             <?php if ($isLoggedIn): ?>
                 <form method="POST" action="/main/actions/comment_submit.php" class="comment-form">
                     <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
-                    <label for="comment-text" class="sr-only-label">Add a comment</label>
-                    <textarea name="comment_text" id="comment-text" maxlength="1000" rows="2"
-                              placeholder="Ask a question or leave a comment..." required></textarea>
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                    <label for="comment-text" class="sr-only-label">Add a question or comment</label>
+                    <textarea 
+                        name="comment_text" 
+                        id="comment-text" 
+                        maxlength="1000" 
+                        placeholder="Ask a question about this skill or schedule..." 
+                        required
+                    ></textarea>
+                    <div>
+                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                    </div>
                 </form>
             <?php else: ?>
-                <p class="info-note"><a href="/main/auth/login.php">Log in</a> to join the discussion.</p>
+                <div class="empty-state" style="padding: 1rem; margin-bottom: 1.5rem;">
+                    <p><a href="/main/auth/login.php">Log in</a> to ask questions or join the discussion.</p>
+                </div>
             <?php endif; ?>
 
             <?php if (empty($comments)): ?>
-                <p class="empty-state">No comments yet. Be the first to ask something.</p>
+                <div class="empty-state" style="padding: 1.5rem;">
+                    <p>No questions posted yet. Be the first to ask about this skill!</p>
+                </div>
             <?php else: ?>
                 <ul class="comment-list">
                     <?php foreach ($comments as $comment): ?>
                         <li class="comment-item">
-                            <p class="comment-header">
-                                <strong><?php echo htmlspecialchars($comment['authorName']); ?></strong>
+                            <div class="comment-header">
+                                <div class="comment-author-wrap">
+                                    <div class="comment-avatar">
+                                        <?php echo htmlspecialchars(mb_substr($comment['authorName'], 0, 1)); ?>
+                                    </div>
+                                    <strong class="comment-author"><?php echo htmlspecialchars($comment['authorName']); ?></strong>
+                                </div>
                                 <span class="comment-date"><?php echo htmlspecialchars(date('d M Y, g:ia', strtotime($comment['createdAt']))); ?></span>
-                            </p>
+                            </div>
                             <p class="comment-text"><?php echo nl2br(htmlspecialchars($comment['commentText'])); ?></p>
                             <?php if ($isLoggedIn && (int) $comment['userId'] === $currentUserId): ?>
-                                <form method="POST" action="/main/actions/comment_delete.php" class="inline-form">
-                                    <input type="hidden" name="comment_id" value="<?php echo (int) $comment['id']; ?>">
-                                    <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
-                                    <button type="submit" class="btn-link-danger" data-confirm="Delete this comment?">Delete</button>
-                                </form>
+                                <div class="comment-actions">
+                                    <form method="POST" action="/main/actions/comment_delete.php" class="inline-form">
+                                        <input type="hidden" name="comment_id" value="<?php echo (int) $comment['id']; ?>">
+                                        <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
+                                        <button type="submit" class="btn-link-danger" data-confirm="Delete this comment?">Delete</button>
+                                    </form>
+                                </div>
                             <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
         </section>
-        <!-- =================== END Comments (Barry) =================== -->
 
     <?php endif; ?>
 
-</section>
+</div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

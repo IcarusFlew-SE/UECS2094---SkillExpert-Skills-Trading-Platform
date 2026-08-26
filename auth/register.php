@@ -1,18 +1,8 @@
 <?php
 /**
  * Handles new user registration.
- *
- * GET  → display the registration form
- * POST → validate input, hash the password, insert a new users row,
- *         then redirect to login on success.
- *
- * Dependencies:
- *   config/db.php   – provides $pdo (PDO connection)
- *   includes/header.php / footer.php – shared page shell
  */
 
-// ── Bootstrap
-// Start session before header.php (which also guards session_start internally).
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -25,129 +15,121 @@ if (isset($_SESSION['user_id'])) {
 
 require_once __DIR__ . '/../config/db.php'; // gives us $pdo
 
-// ── Initialise state
-$errors = [];          // validation error messages shown on the form
-$name   = '';          // re-populate fields so the user doesn't retype everything
+$errors = [];
+$name   = '';
 $email  = '';
 
-// ── POST: process the submitted form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    // Trim whitespace so "  " doesn't sneak through as a valid value.
     $name     = trim($_POST['name']     ?? '');
     $email    = trim($_POST['email']    ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    // ── Server-side validation
-    // All three fields are required.
     if ($name === '') {
         $errors[] = "Name is required.";
     }
     if ($email === '') {
         $errors[] = "Email is required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        // Catches obvious typos like "user@" before we even hit the database.
         $errors[] = "Enter a valid email address.";
     }
     if ($password === '') {
         $errors[] = "Password is required.";
     } elseif (strlen($password) < 6) {
-        // Minimum length check — keeps the password column from storing garbage.
         $errors[] = "Password must be at least 6 characters.";
     }
 
-    // ── Insert into database (only if no validation errors)
     if (empty($errors)) {
-
-        // Hash the password with bcrypt (PASSWORD_DEFAULT).
-        // The resulting string starts with $2y$10$ — never store plaintext.
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-
-        // New registrations start with 5 credits.
         $creditsBalance = 5;
 
         try {
-            // Prepared statement – prevents SQL injection via placeholders
             $stmt = $pdo->prepare(
                 "INSERT INTO users (name, email, passwordHash, creditsBalance)
                  VALUES (?, ?, ?, ?)"
             );
             $stmt->execute([$name, $email, $passwordHash, $creditsBalance]);
 
-            // Auto-login the user after registration
             session_regenerate_id(true);
             $_SESSION['user_id'] = (int) $pdo->lastInsertId();
             $_SESSION['name']    = $name;
 
-            // Send the user to the dashboard
             header("Location: /main/public/index.php");
             exit;
 
         } catch (PDOException $e) {
-            // MySQL error 23000 = UNIQUE constraint violation (duplicate email).
-            // Catch it here and show a friendly message instead of a crash page.
             if ($e->getCode() === '23000') {
-                $errors[] = "This email has already been registered";
+                $errors[] = "This email has already been registered.";
             } else {
-                // Unexpected database error — re-throw so it surfaces during dev.
                 throw $e;
             }
         }
     }
 }
 
-// ── GET (or POST with errors): render the form via URL or submitted data
+$pageTitle = 'Register - SkillExpert';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<section class="auth-section">
-    <h1>Create an Account</h1>
+<link rel="stylesheet" href="/main/assets/css/auth.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/auth.css'); ?>">
 
-    <?php if (!empty($errors)): ?>
-        <!-- Validation error list — shown when any check above fails -->
-        <ul class="error-list">
-            <?php foreach ($errors as $error): ?>
-                <li><?php echo htmlspecialchars($error); ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
+<div class="auth-wrapper">
+    <section class="auth-card">
+        <img src="/main/assets/img/logo-icon-dark.png" alt="SkillExpert" class="auth-logo-icon">
+        <h1>Create an Account</h1>
+        <p class="auth-sub">Join SkillExpert and start exchanging talents today</p>
 
-    <form method="POST" action="/main/auth/register.php" novalidate>
+        <?php if (!empty($errors)): ?>
+            <ul class="error-list">
+                <?php foreach ($errors as $err): ?>
+                    <li><?php echo htmlspecialchars($err); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
 
-        <label for="reg-name">Name</label>
-        <input
-            type="text"
-            id="reg-name"
-            name="name"
-            value="<?php echo htmlspecialchars($name); ?>"
-            required
-            autocomplete="name"
-        >
+        <form method="POST" action="/main/auth/register.php" novalidate>
+            <div>
+                <label for="reg-name">Full Name</label>
+                <input
+                    type="text"
+                    id="reg-name"
+                    name="name"
+                    value="<?php echo htmlspecialchars($name); ?>"
+                    placeholder="e.g. Alice Tan"
+                    required
+                    autocomplete="name"
+                >
+            </div>
 
-        <label for="reg-email">Email</label>
-        <input
-            type="email"
-            id="reg-email"
-            name="email"
-            value="<?php echo htmlspecialchars($email); ?>"
-            required
-            autocomplete="email"
-        >
+            <div>
+                <label for="reg-email">Email Address</label>
+                <input
+                    type="email"
+                    id="reg-email"
+                    name="email"
+                    value="<?php echo htmlspecialchars($email); ?>"
+                    placeholder="you@example.com"
+                    required
+                    autocomplete="email"
+                >
+            </div>
 
-        <label for="reg-password">Password <small>(*minimum 6 characters*)</small></label>
-        <input
-            type="password"
-            id="reg-password"
-            name="password"
-            required
-            autocomplete="new-password"
-        >
-        <!-- Password is intentionally NOT re-populated on failure: security measure -->
+            <div>
+                <label for="reg-password">Password <small>(min 6 chars)</small></label>
+                <input
+                    type="password"
+                    id="reg-password"
+                    name="password"
+                    placeholder="••••••••"
+                    required
+                    autocomplete="new-password"
+                >
+            </div>
 
-        <button type="submit">Register</button>
-    </form>
+            <button type="submit">Create Free Account <span>→</span></button>
+        </form>
 
-    <p>Already have an account? <a href="/main/auth/login.php">Login</a></p>
-</section>
+        <p class="auth-switch">Already have an account? <a href="/main/auth/login.php">Log In</a></p>
+    </section>
+</div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

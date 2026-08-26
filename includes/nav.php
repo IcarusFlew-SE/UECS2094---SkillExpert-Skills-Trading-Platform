@@ -11,7 +11,10 @@ $userName = $_SESSION['name'] ?? 'User';
 ?>
 <nav class="main-nav">
     <div class="nav-container">
-        <a href="/main/public/index.php" class="nav-brand">SkillExpert</a>
+        <a href="/main/public/index.php" class="nav-brand">
+            <img src="/main/assets/img/logo-icon-dark.png" alt="SkillExpert" class="nav-logo-icon">
+            SkillExpert
+        </a>
 
         <input type="checkbox" id="nav-toggle" class="nav-toggle-checkbox">
         <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
