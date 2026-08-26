@@ -105,3 +105,31 @@
 .saved-page-header p {
     color: #d8ccff;
 }
+
+.manage-skill-form {
+    margin-bottom: 2rem;
+}
+
+.manage-skill-form h2 {
+    margin-bottom: 1rem;
+}
+
+.manage-skill-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.manage-skill-form textarea {
+    min-height: 150px;
+}
+
+@media (max-width: 640px) {
+    .saved-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .saved-card-actions,
+    .inline-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

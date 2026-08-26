@@ -61,7 +61,7 @@ require_once __DIR__ . '/../includes/header.php';
 
         <form method="POST" action="/main/auth/login.php" novalidate>
             <div>
-                <label for="login-email">Email Address</label>
+                <label for="login-email" style="margin:2px;">Email Address</label>
                 <input
                     type="email"
                     id="login-email"
@@ -74,7 +74,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <div>
-                <label for="login-password">Password</label>
+                <label for="login-password" style="margin:2px;">Password</label>
                 <input
                     type="password"
                     id="login-password"

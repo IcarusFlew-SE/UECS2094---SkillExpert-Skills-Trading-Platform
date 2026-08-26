@@ -88,7 +88,7 @@ require_once __DIR__ . '/../includes/header.php';
 
         <form method="POST" action="/main/auth/register.php" novalidate>
             <div>
-                <label for="reg-name">Full Name</label>
+                <label for="reg-name" style="margin:2px;">Full Name</label>
                 <input
                     type="text"
                     id="reg-name"
@@ -101,7 +101,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <div>
-                <label for="reg-email">Email Address</label>
+                <label for="reg-email" style="margin:2px;">Email Address</label>
                 <input
                     type="email"
                     id="reg-email"
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <div>
-                <label for="reg-password">Password <small>(min 6 chars)</small></label>
+                <label for="reg-password" style="margin:2px;">Password <small>(min 6 chars)</small></label>
                 <input
                     type="password"
                     id="reg-password"

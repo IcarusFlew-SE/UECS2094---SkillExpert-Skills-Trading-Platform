@@ -34,6 +34,9 @@ $userName = $_SESSION['name'] ?? 'User';
                 <li class="nav-item"><a href="/main/auth/logout.php" class="nav-link btn-logout">Logout</a></li>
             <?php else: ?>
                 <!-- Logged-out state navigation -->
+                <li class="nav-item"><a href="/main/public/index.php" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="/main/public/browse.php" class="nav-link">Browse</a></li>
+                <li class="nav-item"><a href="/main/public/contact.php" class="nav-link">Contact</a></li>
                 <li class="nav-item"><a href="/main/auth/login.php" class="nav-link">Login</a></li>
                 <li class="nav-item"><a href="/main/auth/register.php" class="nav-link btn-register">Register</a></li>
             <?php endif; ?>
