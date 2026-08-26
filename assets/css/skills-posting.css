@@ -37,7 +37,7 @@
     align-items: center;
     gap: 0.6rem;
 
-    color: #a78bfa;
+    color: var(--primary-light);
 
     font-size: 0.85rem;
     font-weight: 700;
@@ -54,10 +54,10 @@
 
     border-radius: 50%;
 
-    background: #8b5cf6;
+    background: var(--primary-color);
 
     box-shadow:
-        0 0 15px rgba(139, 92, 246, 0.9);
+        0 0 15px rgba(155, 124, 247, 0.9);
 
     animation: pulse 2s infinite;
 }
@@ -78,7 +78,7 @@
 
 .skill-hero h1 span {
     display: block;
-    color: #8b5cf6;
+    color: var(--primary-color);
 }
 
 .skill-hero-text {
@@ -170,7 +170,7 @@
     background:
         radial-gradient(
             circle,
-            rgba(124, 58, 237, 0.35),
+            rgba(155, 124, 247, 0.35),
             rgba(37, 99, 235, 0.12),
             transparent 70%
         );
@@ -210,7 +210,7 @@
 
 .floating-skill-card:hover {
     box-shadow:
-        0 50px 120px rgba(124, 58, 237, 0.22);
+        0 50px 120px rgba(155, 124, 247, 0.22);
 }
 
 
@@ -277,7 +277,7 @@
 
     backdrop-filter: blur(20px);
 
-    color: #a78bfa;
+    color: var(--primary-light);
 
     font-size: 4rem;
 
@@ -308,7 +308,7 @@
 }
 
 .hero-card-category {
-    color: #a78bfa;
+    color: var(--primary-light);
 
     font-size: 0.75rem;
     font-weight: 700;
@@ -477,7 +477,7 @@
     border-radius: 50%;
 
     background:
-        rgba(139, 92, 246, 0.15);
+        rgba(155, 124, 247, 0.15);
 
     filter: blur(50px);
 
@@ -583,7 +583,7 @@
 .skill-category-card:hover .category-arrow {
     transform: translateX(5px);
 
-    background: #8b5cf6;
+    background: var(--primary-color);
 }
 
 
@@ -634,7 +634,7 @@
 
     background: #18181b;
 
-    border-color: #8b5cf6;
+    border-color: var(--primary-color);
 }
 
 .category-explore:hover span {
@@ -782,7 +782,7 @@
 .form-group textarea:focus {
     outline: none;
 
-    border-color: #8b5cf6;
+    border-color: var(--primary-color);
 
     box-shadow:
         0 0 0 4px rgba(139,92,246,0.12);
@@ -843,9 +843,9 @@
 }
 
 .category-option.active {
-    background: #8b5cf6;
+    background: var(--primary-color);
 
-    border-color: #8b5cf6;
+    border-color: var(--primary-color);
 
     color: #ffffff;
 
@@ -1013,7 +1013,7 @@
     background:
         rgba(139,92,246,0.15);
 
-    color: #a78bfa;
+    color: var(--primary-light);
 
     font-size: 0.75rem;
 
@@ -1108,14 +1108,14 @@
 
     border-radius: 24px;
 
-    background: #8b5cf6;
+    background: var(--primary-color);
 
     color: #ffffff;
 
     font-size: 2.5rem;
 
     box-shadow:
-        0 20px 50px rgba(139, 92, 246, 0.25);
+        0 20px 50px rgba(155, 124, 247, 0.25);
 
     animation:
         lockedFloat 3s ease-in-out infinite;
@@ -1173,7 +1173,7 @@
 }
 
 .already-account a {
-    color: #a78bfa;
+    color: var(--primary-light);
 }
 
 
@@ -1229,7 +1229,7 @@
 
     border-radius: 50%;
 
-    background: #8b5cf6;
+    background: var(--primary-color);
 
     color: #ffffff;
 

@@ -1,0 +1,229 @@
+/* ===================================================
+   SkillExpert - Shared UI Components
+   Buttons, badges, flash messages, empty states and form helpers.
+   =================================================== */
+
+/* --- Shared Global Button Styles --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    border-radius: var(--radius-full);
+    padding: 0.6rem 1.25rem;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.4);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--lavender-300);
+}
+
+.btn-ghost:hover {
+    background: var(--primary-soft);
+    color: var(--primary-hover);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.btn-accept {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.btn-accept:hover {
+    background-color: #d1fae5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(4, 120, 87, 0.15);
+}
+
+.btn-decline {
+    background-color: #fff1f2;
+    color: #e11d48;
+    border: 1px solid #fecdd3;
+}
+
+.btn-decline:hover {
+    background-color: #ffe4e6;
+    color: #be123c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.15);
+}
+
+.btn-link-danger {
+    background: none;
+    border: none;
+    color: #e11d48;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    transition: var(--transition);
+}
+
+.btn-link-danger:hover {
+    color: #be123c;
+}
+
+.inline-form {
+    display: inline-block;
+}
+
+.sr-only-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+/* --- Status Badges --- */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.status-accepted {
+    background-color: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+
+.status-completed {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.status-declined {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.status-cancelled {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+/* --- Flash Messages --- */
+.flash-msg {
+    padding: 0.9rem 1.25rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    animation: flashSlideIn 0.3s ease;
+}
+
+.flash-success {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    box-shadow: 0 4px 12px rgba(4, 120, 87, 0.08);
+}
+
+.flash-error {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.08);
+}
+
+@keyframes flashSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--text-muted);
+    font-size: 1rem;
+    background: var(--light-surface);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--lavender-300);
+}
+
+.empty-state a {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.info-note,
+.info-note-small {
+    color: var(--text-muted);
+    padding: 0.5rem 0;
+}
+
+.info-note-small {
+    font-size: 0.85rem;
+}
+
+
+/* --- Utility helpers for small, repeated layout needs --- */
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 0.75rem; }
+.mt-3 { margin-top: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.text-muted { color: var(--text-muted); }
+.text-right { text-align: right; }
+.center-narrow { max-width: 600px; margin-inline: auto; text-align: center; }
+.inline-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.form-control { width: 100%; margin-top: 0.5rem; }
+.full-width { width: 100%; }
+.empty-state.compact { padding: 1.5rem; }
+.empty-state.small { padding: 1rem; }
+.push-left-auto { margin-left: auto; }
+.btn-sm { padding: 0.45rem 1rem; font-size: 0.85rem; }
+.btn-sm-narrow { padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+.favorite-mark { color: var(--primary-color); font-size: 1.1rem; }
+
+.mt-4 { margin-top: 2rem; }
+.is-hidden { display: none !important; }

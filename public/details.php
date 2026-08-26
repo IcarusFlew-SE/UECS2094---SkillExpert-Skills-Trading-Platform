@@ -78,8 +78,8 @@ require_once __DIR__ . '/../includes/header.php';
     <?php if (!$skill): ?>
         <div class="empty-state">
             <h2>Skill Not Found</h2>
-            <p style="margin-top: 0.5rem;">The skill listing you requested might have been removed or does not exist.</p>
-            <p style="margin-top: 1rem;"><a href="/main/public/browse.php" class="btn btn-primary">Browse Available Skills</a></p>
+            <p class="mt-1">The skill listing you requested might have been removed or does not exist.</p>
+            <p class="mt-3"><a href="/main/public/browse.php" class="btn btn-primary">Browse Available Skills</a></p>
         </div>
     <?php else: ?>
 
@@ -123,7 +123,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="teacher-name-lg"><?php echo htmlspecialchars($skill['teacherName']); ?></span>
                 </div>
                 <?php if (!empty($ratingSummary['reviewCount'])): ?>
-                    <div class="skill-rating-summary" style="margin-left: auto;">
+                    <div class="skill-rating-summary push-left-auto">
                         <span class="stars" aria-hidden="true"><?php echo renderStars((int) round($ratingSummary['avgRating'])); ?></span>
                         <span><?php echo htmlspecialchars((string) $ratingSummary['avgRating']); ?> / 5 (<?php echo (int) $ratingSummary['reviewCount']; ?>)</span>
                     </div>
@@ -140,11 +140,11 @@ require_once __DIR__ . '/../includes/header.php';
             <h2>⇄ Propose a Skill Swap</h2>
 
             <?php if ($isOwner): ?>
-                <div class="empty-state" style="padding: 1.5rem;">
+                <div class="empty-state compact">
                     <p>This is your own skill listing. You can manage incoming requests from your <a href="/main/public/swaps.php">My Swaps</a> dashboard.</p>
                 </div>
             <?php elseif (!$isLoggedIn): ?>
-                <div class="empty-state" style="padding: 1.5rem;">
+                <div class="empty-state compact">
                     <p>Want to learn this skill? <a href="/main/auth/login.php">Log in</a> or <a href="/main/auth/register.php">create an account</a> to propose a skill exchange with <?php echo htmlspecialchars($skill['teacherName']); ?>.</p>
                 </div>
             <?php else: ?>
@@ -154,7 +154,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div>
                         <label for="offered-skill">Offer one of your skills in exchange (optional)</label>
                         <?php if (!empty($myOwnSkills)): ?>
-                            <select name="offered_skill_id" id="offered-skill" style="width: 100%; margin-top: 0.5rem;">
+                            <select name="offered_skill_id" id="offered-skill" class="form-control">
                                 <option value="">— No specific skill offered (open exchange) —</option>
                                 <?php foreach ($myOwnSkills as $mySkill): ?>
                                     <option value="<?php echo (int) $mySkill['id']; ?>">
@@ -163,7 +163,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <?php endforeach; ?>
                             </select>
                         <?php else: ?>
-                            <p class="info-note-small" style="margin-top: 0.25rem;">
+                            <p class="info-note-small mt-1">
                                 You haven't posted any skills yet, but you can still send an exchange request!
                             </p>
                         <?php endif; ?>
@@ -176,7 +176,7 @@ require_once __DIR__ . '/../includes/header.php';
                             id="swap-message" 
                             maxlength="500" 
                             placeholder="Introduce yourself and explain what you'd like to learn or how you can collaborate..." 
-                            style="width: 100%; margin-top: 0.5rem;"
+                            class="form-control"
                         ></textarea>
                     </div>
 
@@ -194,7 +194,7 @@ require_once __DIR__ . '/../includes/header.php';
             <h2>★ Verified Reviews</h2>
 
             <?php if (empty($reviews)): ?>
-                <div class="empty-state" style="padding: 1.5rem;">
+                <div class="empty-state compact">
                     <p>No reviews yet. Reviews are unlocked once members complete an exchange for this skill.</p>
                 </div>
             <?php else: ?>
@@ -212,7 +212,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <p class="review-comment"><?php echo nl2br(htmlspecialchars($review['comment'])); ?></p>
                             <?php endif; ?>
                             <?php if ($isLoggedIn && (int) $review['userId'] === $currentUserId): ?>
-                                <div style="margin-top: 0.5rem; text-align: right;">
+                                <div class="mt-1 text-right">
                                     <form method="POST" action="/main/actions/review_delete.php" class="inline-form">
                                         <input type="hidden" name="review_id" value="<?php echo (int) $review['id']; ?>">
                                         <input type="hidden" name="return_to" value="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>">
@@ -246,13 +246,13 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                 </form>
             <?php else: ?>
-                <div class="empty-state" style="padding: 1rem; margin-bottom: 1.5rem;">
+                <div class="empty-state small mb-4">
                     <p><a href="/main/auth/login.php">Log in</a> to ask questions or join the discussion.</p>
                 </div>
             <?php endif; ?>
 
             <?php if (empty($comments)): ?>
-                <div class="empty-state" style="padding: 1.5rem;">
+                <div class="empty-state compact">
                     <p>No questions posted yet. Be the first to ask about this skill!</p>
                 </div>
             <?php else: ?>

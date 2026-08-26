@@ -207,3 +207,31 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Post-a-Skill aligned module polish */
+.contact-page {
+    position: relative;
+}
+
+.contact-page-header {
+    padding: 3rem 2rem;
+    border-radius: 28px;
+    background: var(--module-hero-bg);
+    color: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 24px 70px rgba(17, 12, 32, 0.28);
+}
+
+.contact-page-header h1 {
+    color: #ffffff;
+}
+
+.contact-page-header p {
+    color: #d8ccff;
+}
+
+.contact-info-card,
+.contact-form-card {
+    border-color: var(--lavender-200);
+    box-shadow: var(--shadow-lg);
+}

@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (noResultsEl) {
-            noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
+            noResultsEl.classList.toggle('is-hidden', visibleCount !== 0);
         }
     }
 
