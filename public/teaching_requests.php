@@ -122,5 +122,4 @@ function renderTeachingRequestActions(array $swap): void
     <?php endif; ?>
 </section>
 
-<script src="/main/assets/js/swaps.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/swaps.js'); ?>"></script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

@@ -1,0 +1,183 @@
+/* ==========================================
+   SkillExpert - Credits & Ledger Page
+   ========================================== */
+
+.credits-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+}
+
+.credits-page-header {
+    margin-bottom: 2rem;
+    padding: 2.5rem 2rem;
+    border-radius: 28px;
+    background: var(--module-hero-bg);
+    color: #ffffff;
+    box-shadow: 0 24px 70px rgba(17, 12, 32, 0.28);
+}
+
+.credits-page-header .eyebrow {
+    margin: 0 0 0.75rem;
+    color: #efe9ff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.credits-page-header h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+}
+
+.credits-page-header p {
+    color: #d8ccff;
+    font-size: 1.05rem;
+    max-width: 640px;
+}
+
+.credits-summary-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.credits-balance-card {
+    background: #ffffff;
+    border: 1px solid var(--lavender-200);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+}
+
+.credits-balance-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.credits-balance-value {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary-hover);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.credits-balance-unit {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+}
+
+.credits-rules-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.credits-rules-card h2 {
+    font-size: 1.15rem;
+    margin-bottom: 0.85rem;
+}
+
+.credits-rules-card ul {
+    margin: 0 0 1.25rem 1.1rem;
+    color: var(--text-secondary);
+    display: grid;
+    gap: 0.5rem;
+}
+
+.credits-rules-card li strong {
+    color: var(--text-primary);
+}
+
+.credits-history-section h2 {
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+}
+
+.credits-ledger {
+    list-style: none;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.credits-ledger-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.ledger-main {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.ledger-amount {
+    font-size: 1.25rem;
+    font-weight: 800;
+    min-width: 3rem;
+    text-align: center;
+}
+
+.credits-ledger-item.is-credit .ledger-amount {
+    color: #047857;
+}
+
+.credits-ledger-item.is-debit .ledger-amount {
+    color: #be123c;
+}
+
+.ledger-main strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.ledger-skill {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+
+.ledger-date {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+    .credits-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .credits-ledger-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ledger-date {
+        white-space: normal;
+    }
+}

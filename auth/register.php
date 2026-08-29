@@ -48,9 +48,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  VALUES (?, ?, ?, ?)"
             );
             $stmt->execute([$name, $email, $passwordHash, $creditsBalance]);
+            $newUserId = (int) $pdo->lastInsertId();
+
+            require_once __DIR__ . '/../includes/swap_functions.php';
+            recordCreditTransaction(
+                $pdo,
+                $newUserId,
+                $creditsBalance,
+                'welcome_bonus',
+                'Welcome bonus — start learning on SkillExpert'
+            );
 
             session_regenerate_id(true);
-            $_SESSION['user_id'] = (int) $pdo->lastInsertId();
+            $_SESSION['user_id'] = $newUserId;
             $_SESSION['name']    = $name;
 
             header("Location: /main/public/index.php");

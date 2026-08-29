@@ -11,7 +11,7 @@ require_once __DIR__ . '/../config/db.php';
 
 if (!isset($_SESSION['user_id'])) {
 
-    header('Location: ../auth/login.php');
+    header('Location: /main/auth/login.php');
 
     exit;
 
@@ -24,7 +24,7 @@ if (!isset($_SESSION['user_id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
-    header('Location: ../public/posting.php');
+    header('Location: /main/public/posting.php');
 
     exit;
 
@@ -104,7 +104,7 @@ $stmt->execute([
 // ==========================================
 
 header(
-    'Location: ../public/posting.php?published=1'
+    'Location: /main/public/posting.php?published=1'
 );
 
 exit;

@@ -157,6 +157,26 @@ CREATE TABLE IF NOT EXISTS contactMessages (
     INDEX idx_createdAt (createdAt)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Table: creditTransactions
+-- Ledger of credit balance changes (welcome bonus, swap learn/teach).
+CREATE TABLE IF NOT EXISTS creditTransactions (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    userId INT UNSIGNED NOT NULL,
+    amount INT NOT NULL,
+    type ENUM('welcome_bonus', 'swap_learn', 'swap_teach') NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    swapId INT UNSIGNED DEFAULT NULL,
+    relatedUserId INT UNSIGNED DEFAULT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (swapId) REFERENCES swapRequests(id) ON DELETE SET NULL,
+    FOREIGN KEY (relatedUserId) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_user (userId),
+    INDEX idx_createdAt (createdAt)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ============================================================
 -- Demo / seed data
 -- Lets you log in and click through the swap + review + comment flow
@@ -172,9 +192,9 @@ INSERT INTO users (name, email, passwordHash, creditsBalance) VALUES
 
 INSERT INTO skills (userId, title, category, description, imagePath) VALUES
 (1, 'Beginner Guitar Lessons',      'Music',       'Learn open chords, strumming patterns, and your first song in a few sessions.', NULL),
-(2, 'Conversational Spanish',       'Languages',   'Practice everyday Spanish conversation with a patient, friendly tutor.', NULL),
-(3, 'Excel for Data Analysis',      'Technology',  'Pivot tables, formulas, and dashboards for everyday spreadsheet work.', NULL),
-(4, 'Watercolour Painting Basics',  'Art',         'An introduction to washes, colour mixing, and simple landscapes.', NULL);
+(2, 'Conversational Spanish',       'Language',    'Practice everyday Spanish conversation with a patient, friendly tutor.', NULL),
+(3, 'Excel for Data Analysis',      'Academic',    'Pivot tables, formulas, and dashboards for everyday spreadsheet work.', NULL),
+(4, 'Watercolour Painting Basics',  'Design',      'An introduction to washes, colour mixing, and simple landscapes.', NULL);
 
 -- Alice requests Ben's Spanish skill, offering her guitar lessons in return — already completed
 INSERT INTO swapRequests (skillId, requesterId, receiverId, offeredSkillId, message, status, completedBy, completedAt) VALUES
@@ -207,3 +227,10 @@ INSERT INTO savedSkills (userId, skillId) VALUES
 INSERT INTO contactMessages (userId, name, email, subject, message) VALUES
 (1, 'Alice Tan', 'alice@example.com', 'Question about categories', 'Is there a category for cooking skills, or should I use "Other"?'),
 (NULL, 'Guest Visitor', 'guest@example.com', 'General feedback', 'Really like the concept of swapping skills instead of paying — nice work!');
+
+-- Welcome bonus ledger entries for demo users
+INSERT INTO creditTransactions (userId, amount, type, description) VALUES
+(1, 5, 'welcome_bonus', 'Welcome bonus — start learning on SkillExpert'),
+(2, 5, 'welcome_bonus', 'Welcome bonus — start learning on SkillExpert'),
+(3, 5, 'welcome_bonus', 'Welcome bonus — start learning on SkillExpert'),
+(4, 5, 'welcome_bonus', 'Welcome bonus — start learning on SkillExpert');

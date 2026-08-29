@@ -82,7 +82,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
             <?php else: ?>
 
                 <a
-                    href="../auth/register.php"
+                    href="/main/auth/register.php"
                     class="hero-scroll-button"
                     id="start-creating"
                 >
@@ -348,7 +348,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
 
                 <a
-                    href="../auth/register.php"
+                    href="/main/auth/register.php"
                     class="unlock-button"
                 >
                     Create an account →
@@ -359,7 +359,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
                     Already have an account?
 
-                    <a href="../auth/login.php">
+                    <a href="/main/auth/login.php">
                         Log in
                     </a>
 
@@ -400,7 +400,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     <form
                         id="skill-form"
                         method="POST"
-                        action="../actions/create_skills.php"
+                        action="/main/actions/create_skills.php"
                     >
 
 
@@ -652,7 +652,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
 </div>
 
 
-<script src="../assets/js/skills-posting.js"></script>
+<script src="/main/assets/js/skills-posting.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/skills-posting.js'); ?>"></script>
 
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

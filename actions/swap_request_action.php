@@ -121,12 +121,13 @@ if ($newStatus === null) {
 }
 
 if ($newStatus === 'completed') {
-    $stmt = $pdo->prepare(
-        "UPDATE swapRequests
-         SET status = ?, completedBy = ?, completedAt = NOW()
-         WHERE id = ?"
-    );
-    $stmt->execute([$newStatus, $currentUserId, $swapId]);
+    $result = completeSwapWithCredits($pdo, $swap, $currentUserId);
+    if (!$result['ok']) {
+        setFlash('error', $result['message']);
+        header("Location: {$redirectTarget}");
+        exit;
+    }
+    $successMsg = $result['message'];
 } else {
     $stmt = $pdo->prepare("UPDATE swapRequests SET status = ? WHERE id = ?");
     $stmt->execute([$newStatus, $swapId]);
