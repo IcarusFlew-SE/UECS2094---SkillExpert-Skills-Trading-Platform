@@ -44,11 +44,14 @@ if ($message === '') {
     $errors[] = 'Message is required.';
 }
 
-if (strlen($message) > 2000) {
-    $message = substr($message, 0, 2000);
+if (mb_strlen($name) > 100) {
+    $name = mb_substr($name, 0, 100);
 }
-if (strlen($subject) > 150) {
-    $subject = substr($subject, 0, 150);
+if (mb_strlen($message) > 2000) {
+    $message = mb_substr($message, 0, 2000);
+}
+if (mb_strlen($subject) > 150) {
+    $subject = mb_substr($subject, 0, 150);
 }
 
 if (!empty($errors)) {

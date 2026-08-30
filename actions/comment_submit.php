@@ -37,8 +37,8 @@ if ($text === '') {
     exit;
 }
 
-if (strlen($text) > 1000) {
-    $text = substr($text, 0, 1000);
+if (mb_strlen($text) > 1000) {
+    $text = mb_substr($text, 0, 1000);
 }
 
 // Confirm the skill actually exists before attaching a comment to it.
