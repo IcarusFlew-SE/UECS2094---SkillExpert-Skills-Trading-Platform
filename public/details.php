@@ -148,6 +148,9 @@ require_once __DIR__ . '/../includes/header.php';
                     <p>Want to learn this skill? <a href="/main/auth/login.php">Log in</a> or <a href="/main/auth/register.php">create an account</a> to propose a skill exchange with <?php echo htmlspecialchars($skill['teacherName']); ?>.</p>
                 </div>
             <?php else: ?>
+                <?php
+                $userCredits = getUserCreditsBalance($pdo, $currentUserId);
+                ?>
                 <form method="POST" action="/main/actions/swap_request_create.php" class="swap-request-form">
                     <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
 
@@ -184,6 +187,11 @@ require_once __DIR__ . '/../includes/header.php';
                         <button type="submit" class="btn btn-primary">
                             Send Swap Request <span>→</span>
                         </button>
+                        <p class="info-note-small mt-1">
+                            Without offering your own skill, completing this swap costs <strong>1 credit</strong>
+                            (you have <strong><?php echo (int) $userCredits; ?></strong>).
+                            Offer one of your skills above for a direct barter with no credit cost.
+                        </p>
                     </div>
                 </form>
             <?php endif; ?>

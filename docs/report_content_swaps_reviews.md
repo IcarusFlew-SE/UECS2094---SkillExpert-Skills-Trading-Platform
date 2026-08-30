@@ -15,7 +15,8 @@ system described in the assignment brief: "request swap – connect",
 | File | Role |
 |---|---|
 | `database/schema.sql` | `swapRequests`, `reviews`, `comments` tables |
-| `includes/swap_functions.php` | Shared PDO query helpers, flash-message helper |
+| `includes/swap_functions.php` | Shared PDO query helpers, flash-message helper, credit ledger |
+| `public/credits.php` | Credit balance + transaction history page |
 | `includes/review_form_partial.php` | Reusable star-rating review form, included per completed swap |
 | `public/swaps.php` | "My Swaps" (Requests) page — received/sent tabs, all actions |
 | `public/details.php` | Skill details page — request-swap form, reviews list, comment thread |
@@ -27,6 +28,49 @@ system described in the assignment brief: "request swap – connect",
 | `assets/css/style.css` (bottom section) | Status badges, swap cards, CSS-only tabs, star-rating widget, responsive rules |
 
 ## Database design decisions
+
+### Why PDO (not mysqli or a framework ORM)
+
+We use **PDO** (PHP Data Objects) as the single database access layer across every
+page and action script. PDO was chosen deliberately over the older `mysqli`
+extension or a full ORM because it matches the assignment's vanilla-PHP
+constraint while still giving us production-grade safety:
+
+- **Prepared statements with bound parameters** on every query — user input is
+  never concatenated into SQL strings, which closes the SQL-injection surface.
+- **A single connection object (`$pdo`)** initialised once in `config/db.php`
+  and passed into helper functions, keeping the same pattern whether we are
+  reading swap lists or completing a credit transfer inside a transaction.
+- **`PDO::ERRMODE_EXCEPTION`** so constraint violations (duplicate reviews,
+  insufficient credits) surface as catchable exceptions instead of silent
+  failures.
+- **Database-agnostic API** — if the schema were ever moved from MySQL to
+  MariaDB or another engine, the PHP layer would need minimal changes.
+
+This is not "framework magic": every `INSERT`, `UPDATE`, and `SELECT` is written
+by hand with explicit column names, which makes the report's code snippets easy
+to trace back to the schema.
+
+### Credit economy vs. skill barter
+
+SkillExpert supports **two ways to exchange time**, and the code treats them
+differently on purpose:
+
+| Swap type | `offeredSkillId` | Credits on complete |
+|---|---|---|
+| **Straight learn** | `NULL` (open request) | Requester −1, teacher +1 |
+| **Skill barter** | set to requester's own skill | No change |
+
+The rule is implemented in `completeSwapWithCredits()` inside a single database
+transaction with `SELECT … FOR UPDATE` row locks on the swap and the requester's
+balance, so a double-click on "Mark Complete" cannot deduct credits twice.
+Completion is **blocked** when the requester has fewer than 1 credit, with a
+flash error shown on the swaps page.
+
+New members receive **5 welcome credits** on registration (recorded in the
+`creditTransactions` ledger). The nav badge shows the live balance; the
+**My Credits** page (`public/credits.php`) lists every debit and credit with
+timestamps.
 
 `swapRequests` records who is asking whom for a swap, on which skill, with
 an optional skill offered in return, and a `status` enum that models the
@@ -192,6 +236,27 @@ field:
 .star-rating label:hover,
 .star-rating label:hover ~ label { color: #f59e0b; }
 ```
+
+### 7. Atomic credit transfer on swap completion
+
+When a swap is marked `completed` and no skill was offered in return, credits
+move in the same transaction as the status update — requester loses 1, teacher
+gains 1 — and both sides get a ledger row in `creditTransactions`:
+
+```php
+$pdo->beginTransaction();
+// lock swap row + requester balance …
+if (empty($lockedSwap['offeredSkillId'])) {
+    // deduct 1 from requester, add 1 to receiver
+    recordCreditTransaction($pdo, $requesterId, -1, 'swap_learn', '…', $swapId, $receiverId);
+    recordCreditTransaction($pdo, $receiverId,  1, 'swap_teach', '…', $swapId, $requesterId);
+}
+// UPDATE swapRequests SET status = 'completed' …
+$pdo->commit();
+```
+
+Barter swaps skip the credit branch entirely, so exchanging "guitar for Spanish"
+never touches either user's balance.
 
 ## Testing performed
 

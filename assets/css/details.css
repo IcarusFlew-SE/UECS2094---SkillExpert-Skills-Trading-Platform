@@ -380,3 +380,28 @@
     margin-top: 0.5rem;
     text-align: right;
 }
+
+.swap-request-form .info-note-small {
+    margin-top: 0.75rem;
+    max-width: 560px;
+    line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+    .skill-detail-header {
+        flex-direction: column;
+    }
+
+    .save-action-bar {
+        width: 100%;
+    }
+
+    .skill-teacher-bar {
+        flex-wrap: wrap;
+    }
+
+    .push-left-auto {
+        margin-left: 0;
+        width: 100%;
+    }
+}

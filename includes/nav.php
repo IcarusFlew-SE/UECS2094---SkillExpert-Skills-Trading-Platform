@@ -8,6 +8,13 @@ if (!isset($isLoggedIn)) {
     $isLoggedIn = isset($_SESSION['user_id']);
 }
 $userName = $_SESSION['name'] ?? 'User';
+$creditsBalance = null;
+
+if ($isLoggedIn) {
+    require_once __DIR__ . '/../config/db.php';
+    require_once __DIR__ . '/swap_functions.php';
+    $creditsBalance = getUserCreditsBalance($pdo, (int) $_SESSION['user_id']);
+}
 ?>
 <nav class="main-nav">
     <div class="nav-container">
@@ -29,9 +36,15 @@ $userName = $_SESSION['name'] ?? 'User';
                 <li class="nav-item"><a href="/main/public/posting.php" class="nav-link">Post a Skill</a></li>
                 <li class="nav-item"><a href="/main/public/teaching_requests.php" class="nav-link">My Teaching Requests</a></li>
                 <li class="nav-item"><a href="/main/public/swaps.php" class="nav-link">My Swaps</a></li>
+                <li class="nav-item"><a href="/main/public/contact.php" class="nav-link">Contact</a></li>
                 <li class="nav-item nav-user-item">
                     <span class="nav-user-name"><?php echo htmlspecialchars($userName); ?></span>
                 </li>
+                <?php if ($creditsBalance !== null): ?>
+                <li class="nav-item nav-credits-item" title="View your credit history">
+                    <a href="/main/public/credits.php" class="nav-credits-badge"><?php echo (int) $creditsBalance; ?> credit<?php echo (int) $creditsBalance === 1 ? '' : 's'; ?></a>
+                </li>
+                <?php endif; ?>
                 <li class="nav-item"><a href="/main/auth/logout.php" class="nav-link btn-logout">Logout</a></li>
             <?php else: ?>
                 <!-- Logged-out state navigation -->

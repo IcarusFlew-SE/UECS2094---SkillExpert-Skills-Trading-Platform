@@ -86,6 +86,10 @@ function attachTextRequiredGuards() {
 function attachCharCounters() {
     var textareasWithLimit = document.querySelectorAll('textarea[maxlength]');
     textareasWithLimit.forEach(function (textarea) {
+        if (textarea.dataset.charCounterAttached === 'true') {
+            return;
+        }
+
         var max = parseInt(textarea.getAttribute('maxlength'), 10);
         if (!max) {
             return;
@@ -94,6 +98,7 @@ function attachCharCounters() {
         var counter = document.createElement('p');
         counter.className = 'char-counter';
         textarea.insertAdjacentElement('afterend', counter);
+        textarea.dataset.charCounterAttached = 'true';
 
         var updateCounter = function () {
             var remaining = max - textarea.value.length;
@@ -102,7 +107,7 @@ function attachCharCounters() {
         };
 
         textarea.addEventListener('input', updateCounter);
-        updateCounter(); // set initial state on page load
+        updateCounter();
     });
 }
 

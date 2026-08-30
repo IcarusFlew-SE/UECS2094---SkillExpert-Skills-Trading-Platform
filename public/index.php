@@ -3,7 +3,7 @@ require_once __DIR__ . '/../config/db.php';
 $pageTitle = 'SkillExpert - Trade Skills, Not Money';
 
 $stmt = $pdo->query(
-    'SELECT skills.*, users.name AS teacher_name
+    'SELECT skills.*, users.name AS teacherName
     FROM skills 
     JOIN users ON skills.userId = users.id
     ORDER BY skills.createdAt DESC LIMIT 6'
@@ -124,9 +124,9 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="skill-card-footer">
                                 <div class="skill-teacher-meta">
                                     <div class="teacher-avatar-sm">
-                                        <?php echo htmlspecialchars(mb_substr($skill['teacher_name'], 0, 1)); ?>
+                                        <?php echo htmlspecialchars(mb_substr($skill['teacherName'], 0, 1)); ?>
                                     </div>
-                                    <span class="teacher-name-sm"><?php echo htmlspecialchars($skill['teacher_name']); ?></span>
+                                    <span class="teacher-name-sm"><?php echo htmlspecialchars($skill['teacherName']); ?></span>
                                 </div>
                                 <a href="/main/public/details.php?id=<?php echo (int) $skill['id']; ?>" class="skill-card-action">
                                     View <span>→</span>

@@ -1418,6 +1418,10 @@
 
 @media (max-width: 900px) {
 
+    .post-skill-page {
+        overflow: visible;
+    }
+
     .skill-hero {
         grid-template-columns: 1fr;
 

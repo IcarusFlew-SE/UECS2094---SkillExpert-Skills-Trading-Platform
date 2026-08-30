@@ -180,3 +180,176 @@ function getAndClearFlash(): ?array
     unset($_SESSION['flash']);
     return $flash;
 }
+
+/**
+ * Live credit balance for the nav badge and swap-cost checks.
+ */
+function getUserCreditsBalance(PDO $pdo, int $userId): int
+{
+    $stmt = $pdo->prepare('SELECT creditsBalance FROM users WHERE id = ? LIMIT 1');
+    $stmt->execute([$userId]);
+    $row = $stmt->fetch();
+    return $row ? (int) $row['creditsBalance'] : 0;
+}
+
+/**
+ * Mark a swap complete and apply the credit economy in one transaction.
+ *
+ * Straight request (no offeredSkillId): requester −1, receiver +1.
+ * Barter (offeredSkillId set): no credit change.
+ * Blocks completion when the requester has fewer than 1 credit.
+ *
+ * @return array{ok: bool, message: string}
+ */
+function completeSwapWithCredits(PDO $pdo, array $swap, int $completedByUserId): array
+{
+    if ($swap['status'] !== 'accepted') {
+        return ['ok' => false, 'message' => 'Only an accepted swap can be marked complete.'];
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        $lockStmt = $pdo->prepare(
+            'SELECT id, status, requesterId, receiverId, offeredSkillId
+             FROM swapRequests
+             WHERE id = ?
+             FOR UPDATE'
+        );
+        $lockStmt->execute([(int) $swap['id']]);
+        $lockedSwap = $lockStmt->fetch();
+
+        if (!$lockedSwap || $lockedSwap['status'] !== 'accepted') {
+            $pdo->rollBack();
+            return ['ok' => false, 'message' => 'That swap is no longer in an accepted state.'];
+        }
+
+        $isCreditSwap = empty($lockedSwap['offeredSkillId']);
+
+        if ($isCreditSwap) {
+            $requesterId = (int) $lockedSwap['requesterId'];
+            $receiverId  = (int) $lockedSwap['receiverId'];
+
+            $balanceStmt = $pdo->prepare(
+                'SELECT creditsBalance FROM users WHERE id = ? FOR UPDATE'
+            );
+            $balanceStmt->execute([$requesterId]);
+            $requesterRow = $balanceStmt->fetch();
+
+            if (!$requesterRow || (int) $requesterRow['creditsBalance'] < 1) {
+                $pdo->rollBack();
+                return [
+                    'ok' => false,
+                    'message' => 'The requester does not have enough credits to complete this swap.',
+                ];
+            }
+
+            $deductStmt = $pdo->prepare(
+                'UPDATE users SET creditsBalance = creditsBalance - 1 WHERE id = ?'
+            );
+            $deductStmt->execute([$requesterId]);
+
+            $creditStmt = $pdo->prepare(
+                'UPDATE users SET creditsBalance = creditsBalance + 1 WHERE id = ?'
+            );
+            $creditStmt->execute([$receiverId]);
+
+            $swapId = (int) $swap['id'];
+            $receiverNameStmt = $pdo->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
+            $receiverNameStmt->execute([$receiverId]);
+            $receiverName = $receiverNameStmt->fetchColumn() ?: 'the teacher';
+            $requesterNameStmt = $pdo->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
+            $requesterNameStmt->execute([$requesterId]);
+            $requesterName = $requesterNameStmt->fetchColumn() ?: 'the learner';
+
+            recordCreditTransaction(
+                $pdo,
+                $requesterId,
+                -1,
+                'swap_learn',
+                'Learned a skill — 1 credit to ' . $receiverName,
+                $swapId,
+                $receiverId
+            );
+            recordCreditTransaction(
+                $pdo,
+                $receiverId,
+                1,
+                'swap_teach',
+                'Taught a skill — 1 credit from ' . $requesterName,
+                $swapId,
+                $requesterId
+            );
+        }
+
+        $completeStmt = $pdo->prepare(
+            'UPDATE swapRequests
+             SET status = ?, completedBy = ?, completedAt = NOW()
+             WHERE id = ?'
+        );
+        $completeStmt->execute(['completed', $completedByUserId, (int) $swap['id']]);
+
+        $pdo->commit();
+
+        if ($isCreditSwap) {
+            return [
+                'ok' => true,
+                'message' => 'Swap marked as complete — 1 credit transferred to the teacher.',
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'message' => 'Swap marked as complete — you can leave a review now.',
+        ];
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        return ['ok' => false, 'message' => 'Unable to complete that swap right now. Please try again.'];
+    }
+}
+
+/**
+ * Record a single credit ledger entry (amount positive = earned, negative = spent).
+ */
+function recordCreditTransaction(
+    PDO $pdo,
+    int $userId,
+    int $amount,
+    string $type,
+    string $description,
+    ?int $swapId = null,
+    ?int $relatedUserId = null
+): void {
+    $allowedTypes = ['welcome_bonus', 'swap_learn', 'swap_teach'];
+    if (!in_array($type, $allowedTypes, true)) {
+        return;
+    }
+
+    $stmt = $pdo->prepare(
+        'INSERT INTO creditTransactions (userId, amount, type, description, swapId, relatedUserId)
+         VALUES (?, ?, ?, ?, ?, ?)'
+    );
+    $stmt->execute([$userId, $amount, $type, $description, $swapId, $relatedUserId]);
+}
+
+/**
+ * Credit history for the account page, newest first.
+ */
+function getCreditTransactionsForUser(PDO $pdo, int $userId, int $limit = 50): array
+{
+    $limit = max(1, min(100, $limit));
+    $stmt = $pdo->prepare(
+        "SELECT ct.*, u.name AS relatedUserName, sk.title AS skillTitle
+         FROM creditTransactions ct
+         LEFT JOIN users u ON ct.relatedUserId = u.id
+         LEFT JOIN swapRequests sr ON ct.swapId = sr.id
+         LEFT JOIN skills sk ON sr.skillId = sk.id
+         WHERE ct.userId = ?
+         ORDER BY ct.createdAt DESC
+         LIMIT {$limit}"
+    );
+    $stmt->execute([$userId]);
+    return $stmt->fetchAll();
+}
