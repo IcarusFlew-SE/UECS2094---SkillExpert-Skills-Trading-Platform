@@ -32,8 +32,8 @@ $offeredSkillId  = filter_input(INPUT_POST, 'offered_skill_id', FILTER_VALIDATE_
 $message         = trim($_POST['message'] ?? '');
 
 // Cap message length so a runaway textarea can't bloat the table.
-if (strlen($message) > 500) {
-    $message = substr($message, 0, 500);
+if (mb_strlen($message) > 500) {
+    $message = mb_substr($message, 0, 500);
 }
 
 // Where do we send the user back to? Always the skill they were looking at.

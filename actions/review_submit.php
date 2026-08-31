@@ -45,10 +45,9 @@ $swapId  = filter_input(INPUT_POST, 'swap_id', FILTER_VALIDATE_INT);
 $rating  = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT);
 $comment = trim($_POST['comment'] ?? '');
 
-if (strlen($comment) > 1000) {
-    $comment = substr($comment, 0, 1000);
+if (mb_strlen($comment) > 1000) {
+    $comment = mb_substr($comment, 0, 1000);
 }
-
 if (!$swapId || !$rating || $rating < 1 || $rating > 5) {
     setFlash('error', 'Please choose a rating between 1 and 5 stars.');
     header("Location: $redirectTarget");
