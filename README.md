@@ -309,10 +309,9 @@ main/
 
 - [docs/BEGINNER_GUIDE.md](docs/BEGINNER_GUIDE.md) — Full beginner walkthrough: folders, database, features, how to trace code
 - [docs/report_content_swaps_reviews.md](docs/report_content_swaps_reviews.md) — Drop-in report sections: database design, PDO choice, credit economy, key code snippets, testing notes
-- [plan](plan) — Internal consolidated implementation checklist
 
 ---
 
 ## Status
 
-Core assignment requirements, full CRUD, swap lifecycle, verified reviews, wishlist, contact, and the credit economy are implemented and tested on WampServer. Remaining work is mostly report writing and optional simplification (e.g. remove ledger if you prefer balance-only).
+Core assignment requirements, full CRUD, swap lifecycle, verified reviews, wishlist, contact, and the credit economy are implemented and tested on WampServer. 
