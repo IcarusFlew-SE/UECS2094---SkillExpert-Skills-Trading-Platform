@@ -1,4 +1,4 @@
-# Report content — Swap & Review Module (Barry)
+# Report content — Swap & Review Module
 
 Drop-in content for the group's PDF report. Written to slot under the
 existing report headings (Website Structure, Key Code Snippets with

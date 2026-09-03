@@ -25,7 +25,7 @@ SkillExpert is a **peer-to-peer skills exchange website**. Users can:
 | Interactivity | Vanilla JavaScript |
 | Database | MySQL via PHP **PDO** |
 
-There is **no framework** (no Laravel, no React). Every file is plain PHP that the server runs when you visit a URL.
+There is **no framework** involved. Every file is plain PHP that the server runs when you visit a URL.
 
 ---
 
