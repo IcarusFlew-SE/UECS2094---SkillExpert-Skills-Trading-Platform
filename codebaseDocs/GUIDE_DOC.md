@@ -422,8 +422,6 @@ Do the same for **login**, **complete swap**, and **submit review** — you will
 | File | Audience |
 |------|----------|
 | [README.md](../README.md) | Setup, features, demo data |
-| [report_content_swaps_reviews.md](report_content_swaps_reviews.md) | Report snippets for swap/review module |
-| [plan](../plan) | Internal checklist of what's implemented |
 
 ---
 

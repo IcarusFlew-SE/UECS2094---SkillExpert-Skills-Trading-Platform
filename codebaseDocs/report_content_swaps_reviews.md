@@ -1,11 +1,5 @@
 # Report content — Swap & Review Module
 
-Drop-in content for the group's PDF report. Written to slot under the
-existing report headings (Website Structure, Key Code Snippets with
-Explanations). Trim/adapt wording to match the rest of the report's voice.
-
----
-
 ## Website structure (this module's contribution)
 
 This module implements the swap-request lifecycle and the review/comment

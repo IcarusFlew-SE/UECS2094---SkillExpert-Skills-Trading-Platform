@@ -25,8 +25,7 @@ Built with **Vanilla HTML, CSS, JavaScript, PHP (PDO), and MySQL** — no framew
 9. [Security Implementation](#9-security-implementation)
 10. [Project Directory Structure](#10-project-directory-structure)
 11. [Assignment Requirements Map](#11-assignment-requirements-map)
-12. [Module Ownership](#12-module-ownership)
-13. [Further Documentation](#13-further-documentation)
+12. [Further Documentation](#12-further-documentation)
 
 ---
 
@@ -297,18 +296,10 @@ main/
 
 ---
 
-## 12. Module Ownership
 
-- **Auth, navigation, home, browse, posting, details layout:** Teammate
-- **Swaps, teaching requests, reviews, comments, contact, wishlist, credits:** Barry  
-  See [docs/report_content_swaps_reviews.md](docs/report_content_swaps_reviews.md) for report-ready snippets (PDO rationale, credit vs barter, swap authorization).
+## 12. Further Documentation
 
----
-
-## 13. Further Documentation
-
-- [docs/BEGINNER_GUIDE.md](docs/BEGINNER_GUIDE.md) — Full beginner walkthrough: folders, database, features, how to trace code
-- [docs/report_content_swaps_reviews.md](docs/report_content_swaps_reviews.md) — Drop-in report sections: database design, PDO choice, credit economy, key code snippets, testing notes
+- [docs/GUIDE_DOCS.md](docs/GUIDE_DOCS.md) — Full beginner walkthrough: folders, database, features, how to trace code
 
 ---
 
