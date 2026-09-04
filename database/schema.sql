@@ -1,11 +1,5 @@
 -- SkillExpert Platform – Database Schema
 -- Run once against a local MySQL server: mysql -u root -p < database/schema.sql
---
--- NOTE (Barry, swap & review module): the `skills` table below had a bug —
--- its foreign key pointed at a table called `user` (singular), which doesn't
--- exist anywhere in this file, so the ORIGINAL script could not run past that
--- CREATE TABLE. Fixed it to reference `users` (plural), which is what's
--- actually declared above it. Flagging this here so nobody re-introduces it.
 
 CREATE DATABASE IF NOT EXISTS swapexpert
   CHARACTER SET utf8mb4
@@ -40,10 +34,6 @@ CREATE TABLE IF NOT EXISTS skills (
     INDEX idx_category (category),
     INDEX idx_user (userId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================
--- Swap & Review module (Barry) — swapRequests, reviews, comments
--- ============================================================
 
 -- Table: swapRequests
 -- Tracks a skill-swap request from one user (requester) to another
@@ -117,10 +107,6 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_skill (skillId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================
--- Contact & Saved-items module (Barry)
--- ============================================================
 
 -- Table: savedSkills
 -- A logged-in user's wishlist/bookmark list. Users must register and log in
