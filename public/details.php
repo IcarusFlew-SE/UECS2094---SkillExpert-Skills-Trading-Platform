@@ -91,7 +91,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <h1><?php echo htmlspecialchars($skill['title']); ?></h1>
                 </div>
 
-                <!-- Save / Bookmark Button -->
+                <!-- Save / Bookmark Button OR Owner Action Buttons -->
                 <?php if ($isLoggedIn && !$isOwner): ?>
                     <div class="save-action-bar">
                         <?php if ($isSaved): ?>
@@ -110,6 +110,14 @@ require_once __DIR__ . '/../includes/header.php';
                                 </button>
                             </form>
                         <?php endif; ?>
+                    </div>
+                <?php elseif ($isOwner): ?>
+                    <div class="save-action-bar">
+                        <a href="/main/public/my_skills.php?edit=<?php echo (int) $skill['id']; ?>#edit-skill" class="btn btn-primary btn-sm">Edit Skill</a>
+                        <form method="POST" action="/main/actions/skill_delete.php" class="inline-form">
+                            <input type="hidden" name="skill_id" value="<?php echo (int) $skill['id']; ?>">
+                            <button type="submit" class="btn btn-decline btn-sm-narrow" data-confirm="Delete this skill permanently? This removes it for other users too, including saved entries, comments, reviews, and related swap requests.">Delete Skill</button>
+                        </form>
                     </div>
                 <?php endif; ?>
             </div>
@@ -141,7 +149,7 @@ require_once __DIR__ . '/../includes/header.php';
 
             <?php if ($isOwner): ?>
                 <div class="empty-state compact">
-                    <p>This is your own skill listing. You can manage incoming requests from your <a href="/main/public/swaps.php">My Swaps</a> dashboard.</p>
+                    <p>This is your own skill listing. You can manage incoming requests from your <a href="/main/public/swaps.php">My Swaps</a> dashboard, or manage and edit your listings in <a href="/main/public/my_skills.php">My Skills</a>.</p>
                 </div>
             <?php elseif (!$isLoggedIn): ?>
                 <div class="empty-state compact">

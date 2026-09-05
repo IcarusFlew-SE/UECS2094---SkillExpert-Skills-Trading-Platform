@@ -75,6 +75,7 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
+    error_log('Skill delete failed: ' . $e->getMessage());
     setFlash('error', 'Unable to delete that skill right now. Please try again.');
     header('Location: /main/public/my_skills.php');
     exit;

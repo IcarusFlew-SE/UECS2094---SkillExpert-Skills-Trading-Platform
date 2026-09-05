@@ -26,6 +26,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                 <p>
                     Your skill has been successfully added
                     to SkillExpert.
+                    <a href="/main/public/my_skills.php" style="color: inherit; text-decoration: underline; font-weight: 600; display: inline-block; margin-top: 0.25rem;">View &amp; manage your skills &rarr;</a>
                 </p>
             </div>
 
