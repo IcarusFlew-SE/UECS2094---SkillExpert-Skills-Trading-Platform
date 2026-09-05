@@ -54,17 +54,17 @@ Form POST  →  actions/swap_request_create.php  →  INSERT into DB  →  redir
 
 ```
 main/
-├── public/          ← Pages users SEE (browse, details, swaps…)
-├── actions/         ← Form handlers that WRITE to the database (no HTML layout)
+├── public/          ← Pages users SEE (browse, details, my_skills, swaps…)
+├── actions/         ← Form handlers that WRITE to the database (PRG: create, update, delete)
 ├── auth/            ← Login, register, logout, session guard
 ├── includes/        ← Reusable chunks: header, nav, footer, helper functions
 ├── config/          ← Database connection (db.php)
 ├── database/        ← schema.sql (tables + demo data)
 ├── assets/
-│   ├── css/         ← One stylesheet per page + shared layout/components
+│   ├── css/         ← One stylesheet per page (including my-skills.css) + shared layout/components
 │   ├── js/          ← browse.js, skills-posting.js, swaps.js
 │   └── img/         ← Logo
-└── docs/            ← Documentation (like this file)
+└── codebaseDocs/    ← Project documentation and technical reports (like this file)
 ```
 
 **Rule of thumb:**
@@ -93,15 +93,22 @@ All data lives in MySQL database **`swapexpert`**. Defined in `database/schema.s
 | `contactMessages` | Contact form submissions |
 | `creditTransactions` | Optional log of credit changes (welcome bonus, learn/teach) |
 
-**Relationships (simplified):**
+**Relationships & Foreign Key Cascades:**
 
 ```
-users ──< skills          (one user owns many skills)
-users ──< swapRequests    (as requester or receiver)
-swapRequests ──< reviews  (reviews only exist for a swap)
-skills ──< comments       (discussion on a listing)
-users + skills ──< savedSkills
+users ──< skills          (ON DELETE CASCADE: deleting account removes their skills)
+users ──< swapRequests    (ON DELETE CASCADE for both requesterId and receiverId)
+skills ──< swapRequests   (ON DELETE CASCADE for requested skillId; ON DELETE SET NULL for offeredSkillId)
+swapRequests ──< reviews  (ON DELETE CASCADE: reviews are tied to completed swaps)
+skills ──< comments       (ON DELETE CASCADE: deleting skill cleans up discussion)
+users + skills ──< savedSkills (ON DELETE CASCADE: wishlist junction entries)
 ```
+
+**What happens when a skill is deleted?**
+- Dependents in `swapRequests`, `comments`, and `savedSkills` are removed automatically by MySQL.
+- Any reviews linked to those swaps are cleanly removed through the `swapRequests` cascade.
+- If someone else offered this skill in a barter proposal, `offeredSkillId` is safely updated to `NULL` (`ON DELETE SET NULL`) without deleting their swap.
+- Completed swap audit records in `creditTransactions` retain ledger integrity with `swapId = NULL`.
 
 **Connecting in PHP** — every file that needs the DB starts with:
 
@@ -179,7 +186,9 @@ require_once __DIR__ . '/../includes/header.php';  // 2. <html>, <head>, opens <
 
 **`includes/header.php`** starts the session, sets `$isLoggedIn`, prints `<head>`, and includes **`nav.php`**.
 
-**`includes/nav.php`** shows different links for logged-in vs guest users, plus the **credit badge** (links to My Credits).
+**`includes/nav.php`** shows different links for logged-in vs guest users:
+- **Logged in:** Browse, Saved (Wishlist), **My Skills** (creator dashboard), Post a Skill, My Teaching Requests, My Swaps, Contact, plus the **credit badge** (links to My Credits) and Logout.
+- **Logged out:** Home, Browse, Contact, Login, Register.
 
 **`includes/footer.php`** closes `</main>`, prints the site footer, and loads **`swaps.js`** once globally.
 
@@ -205,8 +214,9 @@ One page, many features:
 | UI section | Backend |
 |------------|---------|
 | Skill info | `SELECT` from `skills` JOIN `users` |
-| Swap form | POST → `actions/swap_request_create.php` |
-| Save button | POST → `actions/skill_save.php` or `skill_unsave.php` |
+| Owner actions (if owner) | Direct **Edit Skill** (`my_skills.php?edit=...`) & **Delete Skill** (POST → `actions/skill_delete.php`) |
+| Swap proposal form (if visitor) | POST → `actions/swap_request_create.php` |
+| Save / Wishlist toggle (if visitor) | POST → `actions/skill_save.php` or `skill_unsave.php` |
 | Reviews list | `getReviewsForSkill()` in `swap_functions.php` |
 | Comment thread | `getCommentsForSkill()` + `comment_submit.php` |
 
@@ -217,12 +227,19 @@ One page, many features:
 - Guests see "create an account" CTA.
 - Logged-in users fill the form; POST goes to `create_skills.php`.
 - `skills-posting.js` powers live preview and 3D card tilt.
+- Post-publish success banner includes an instant shortcut link to view and manage listings on My Skills.
 
-### 7.5 My skills — `public/my_skills.php`
+### 7.5 My skills — `public/my_skills.php` + `assets/css/my-skills.css`
 
-- Lists only **your** skills (`WHERE userId = ?`).
-- Edit → `actions/skill_update.php`
-- Delete → `actions/skill_delete.php`
+The central creator dashboard for skill owners:
+
+- **Metrics ribbon:** Real-time summary counts for Active Listings, Swap Inquiries, Active Exchanges (with a pulsating green status light), and Wishlist Saves.
+- **Skill cards with live metrics:** Each card displays its category badge, wishlist saves counter, swap request counts, and an impact alert if active exchanges are linked.
+- **Direct actions:**
+  - **View:** Jump to public `details.php?id=...` page.
+  - **Edit:** Opens the inline glassmorphic edit card (`#edit-skill`) to modify title, category, and description → saved via `actions/skill_update.php`.
+  - **Delete:** Protected by a `[data-confirm]` warning modal; executes cascade deletion and rollback protection via `actions/skill_delete.php`.
+- **Empty state:** Welcoming onboarding container when a user has not published skills yet.
 
 ### 7.6 Swaps — `public/swaps.php`
 
@@ -325,13 +342,22 @@ Each load ran `attachCharCounters()`, which inserted a new `<p class="char-count
 
 Shared (every page via `header.php`):
 
-- `style.css` — colors, fonts, variables
-- `layout.css` — navbar, footer, credit badge
-- `components.css` — buttons, flash messages, forms
+- `style.css` — colors, fonts, design tokens, CSS variables
+- `layout.css` — navbar, footer, credit badge, responsive mobile toggle
+- `components.css` — buttons, flash messages, forms, status pills
 
 Page-specific (linked in each `public/*.php`):
 
-- `home.css`, `browse.css`, `details.css`, `swaps.css`, etc.
+- `home.css` — landing hero & feature grid
+- `browse.css` — catalog, search bar & category filters
+- `details.css` — full skill details & proposal form
+- `skills-posting.css` — 3D card tilt & live post form
+- `my-skills.css` — creator dashboard, metrics ribbon & inline editor
+- `swaps.css` — received/sent swap requests & teaching dashboard
+- `saved.css` — user wishlist
+- `contact.css` — public contact form & cards
+- `auth.css` — login & register panels
+- `credits.css` — credit economy ledger & balance card
 
 **Cache busting:** `?v=<?php echo filemtime(...); ?>` forces browsers to reload CSS after you edit files.
 
@@ -343,16 +369,17 @@ Page-specific (linked in each `public/*.php`):
 |--------|---------------------------|
 | SQL injection | PDO prepared statements (`?` placeholders) |
 | XSS | `htmlspecialchars()` on all user-visible output |
-| Unauthorized edits | `session_check.php` + ownership checks in actions |
+| Unauthorized edits | `session_check.php` + ownership checks in actions before `UPDATE` / `DELETE` |
 | Wrong person accepting swap | `swap_request_action.php` verifies requester/receiver |
 | Double review | DB unique key + `userHasReviewed()` |
-| Session fixation | `session_regenerate_id()` on login |
+| Session fixation | `session_regenerate_id(true)` on login/register |
+| Transaction failure | Transaction rollback (`$pdo->rollBack()`) on constraint or database exceptions |
 
 ---
 
-## 12. How to trace a feature (learning exercise)
+## 12. How to trace a feature (learning exercises)
 
-**Example: "What happens when I click Send Swap Request?"**
+### Example 1: "What happens when I click Send Swap Request?"
 
 1. Open `public/details.php` — find the form `action="/main/actions/swap_request_create.php"`.
 2. Open `actions/swap_request_create.php` — read top to bottom:
@@ -365,7 +392,23 @@ Page-specific (linked in each `public/*.php`):
    - `header('Location: details.php?id=...')`
 3. Browser loads details again — `getAndClearFlash()` shows green banner.
 
-Do the same for **login**, **complete swap**, and **submit review** — you will understand 80% of the app.
+### Example 2: "What happens when I delete one of my skills?"
+
+1. Click **Delete** on `public/my_skills.php` or `public/details.php`.
+2. Browser displays confirmation dialog (`data-confirm` handled in `swaps.js`):
+   *"Delete this skill permanently? This removes it for other users too, including saved entries, comments, reviews, and related swap requests."*
+3. On confirm, browser POSTs `skill_id` to `actions/skill_delete.php`.
+4. `actions/skill_delete.php` runs:
+   - `session_check.php` ensures authentication.
+   - Verifies ownership: `SELECT id, title FROM skills WHERE id = ? AND userId = ?`.
+   - Pre-calculates cascade impact (counts active swap requests, comments, bookmarks, and reviews).
+   - Starts a transaction: `$pdo->beginTransaction()`.
+   - Executes `DELETE FROM skills WHERE id = ? AND userId = ?`.
+   - MySQL's foreign key constraints automatically cascade deletions to dependent `swapRequests`, `comments`, and `savedSkills` (and `reviews` via swap cascade), while setting `offeredSkillId = NULL` for third-party barter swaps.
+   - Commits transaction: `$pdo->commit()`.
+   - Formats a helpful impact message: *"Skill '[title]' was deleted. Impact: 1 active request(s) closed, 2 saved-list item(s) removed..."*
+   - Calls `setFlash('success', $message)` and redirects back to `public/my_skills.php`.
+5. Browser reloads `my_skills.php` via GET (`PRG`), displaying the updated skills grid and green flash alert.
 
 ---
 
@@ -384,6 +427,7 @@ Do the same for **login**, **complete swap**, and **submit review** — you will
 2. Log in as Alice → Teaching Requests → accept → complete.
 3. Both users → My Swaps → leave a review.
 4. Click credit badge → see ledger on My Credits.
+5. Go to My Skills → edit a skill title or delete a listing → review the cascading update.
 
 ---
 
@@ -392,11 +436,11 @@ Do the same for **login**, **complete swap**, and **submit review** — you will
 | # | Requirement | Where |
 |---|-------------|-------|
 | I | Home | `public/index.php` |
-| II | CRUD | skills, swaps, reviews, comments, contact, saved |
-| III | Navigation | `includes/nav.php` |
+| II | CRUD (Multiple) | **Skills** (Create: `posting.php`, Read: `browse.php`/`details.php`/`my_skills.php`, Update/Delete: `my_skills.php` & `details.php`), **Swaps** (`swaps.php`), **Reviews** (`review_submit.php`/`review_delete.php`), **Comments** (`comment_submit.php`/`comment_delete.php`), **Contact**, **Wishlist** |
+| III | Navigation | `includes/nav.php` (login-aware, responsive, includes direct **My Skills** access) |
 | IV | Contact | `public/contact.php` |
 | V | Listing + filter | `public/browse.php` |
-| VI | Item details | `public/details.php` |
+| VI | Item details | `public/details.php` (includes direct owner edit/delete controls) |
 | VII | Wishlist | `public/saved.php` |
 | VIII | Login | `auth/` |
 | IX | Responsive | CSS `@media` in layout + page stylesheets |
@@ -414,6 +458,7 @@ Do the same for **login**, **complete swap**, and **submit review** — you will
 | **Barter swap** | Both users trade skills; no credits used |
 | **Credit swap** | Learner pays 1 credit to teacher on completion |
 | **Verified review** | Review linked to a completed swap, not a free-for-all rating |
+| **Cascade delete** | Database engine automatically removes orphaned child records when parent is deleted |
 
 ---
 
@@ -421,8 +466,9 @@ Do the same for **login**, **complete swap**, and **submit review** — you will
 
 | File | Audience |
 |------|----------|
-| [README.md](../README.md) | Setup, features, demo data |
+| [README.md](../README.md) | Setup, features, architecture, demo data |
+| [report_content_swaps_reviews.md](report_content_swaps_reviews.md) | Technical report on swap lifecycle, reviews, and credit transactions |
 
 ---
 
-*Last updated after fixing duplicate character counter on My Teaching Requests.*
+*Last updated after adding the My Skills dashboard, cascade deletion flows, and dedicated my-skills.css styling.*

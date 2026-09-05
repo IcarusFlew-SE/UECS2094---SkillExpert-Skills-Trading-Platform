@@ -131,13 +131,13 @@ Hero, featured skills grid, and a 3-step “how it works” guide.
 Live client-side search and category filter pills (*Programming, Design, Language, Music, Sports, Academic, Other*).
 
 ### Skill Details — [public/details.php](public/details.php)
-Full listing view, swap proposal form (barter or credit), wishlist toggle, verified reviews, and Q&A comments.
+Full listing view, swap proposal form (barter or credit), wishlist toggle, verified reviews, and Q&A comments. For skill owners, direct **Edit Skill** and **Delete Skill** action controls are displayed in the header alongside quick dashboard management links.
 
 ### Post a Skill — [public/posting.php](public/posting.php) + [assets/js/skills-posting.js](assets/js/skills-posting.js)
-Interactive 3D hero, live preview card, category picker. Guests see a sign-up prompt; logged-in users publish via [actions/create_skills.php](actions/create_skills.php).
+Interactive 3D hero, live preview card, category picker. Guests see a sign-up prompt; logged-in users publish via [actions/create_skills.php](actions/create_skills.php), with an instant transition link to manage and edit listings.
 
-### My Skills — [public/my_skills.php](public/my_skills.php)
-Owner dashboard: edit title/category/description, delete own listings.
+### My Skills — [public/my_skills.php](public/my_skills.php) + [assets/css/my-skills.css](assets/css/my-skills.css)
+Dedicated teacher dashboard with live creator metrics ribbon (active listings, swap inquiries, active exchanges with pulsating indicator, wishlist saves), inline glassmorphic editor ([actions/skill_update.php](actions/skill_update.php)), and cascade-safe deletion ([actions/skill_delete.php](actions/skill_delete.php)) with transaction locking, impact summaries, and confirmation prompts. Accessible directly via the main navigation bar.
 
 ### Swap Lifecycle — [public/swaps.php](public/swaps.php), [public/teaching_requests.php](public/teaching_requests.php)
 Received/sent tabs, accept / decline / cancel / complete, inline review forms after completion.
@@ -232,8 +232,9 @@ Page-specific stylesheets:
 | [browse.css](assets/css/browse.css) | Catalog |
 | [details.css](assets/css/details.css) | Skill details |
 | [skills-posting.css](assets/css/skills-posting.css) | Post a skill |
+| [my-skills.css](assets/css/my-skills.css) | My skills dashboard |
 | [swaps.css](assets/css/swaps.css) | Swaps, teaching requests |
-| [saved.css](assets/css/saved.css) | Wishlist, my skills |
+| [saved.css](assets/css/saved.css) | Wishlist |
 | [contact.css](assets/css/contact.css) | Contact |
 | [auth.css](assets/css/auth.css) | Login / register |
 | [credits.css](assets/css/credits.css) | Credits & ledger |
@@ -256,21 +257,21 @@ Assets use `?v=<?php echo filemtime(...); ?>` cache-busting.
 
 ```
 main/
-├── actions/              # POST handlers (PRG)
-├── assets/css/           # Modular stylesheets
+├── actions/              # POST handlers (PRG): skill_delete, skill_update, swap actions, etc.
+├── assets/css/           # Modular stylesheets (layout, components, my-skills, etc.)
 ├── assets/js/            # browse.js, skills-posting.js, swaps.js
 ├── assets/img/           # Logo
 ├── auth/                 # login, register, logout, session_check
+├── codebaseDocs/         # Technical guides and reports (GUIDE_DOC.md, etc.)
 ├── config/db.php         # PDO connection
 ├── database/schema.sql   # Schema + seed data
-├── docs/                 # Report walkthrough content
 ├── includes/             # header, nav, footer, swap/saved helpers
 └── public/               # User-facing pages
     ├── index.php
     ├── browse.php
     ├── details.php
     ├── posting.php
-    ├── my_skills.php
+    ├── my_skills.php     # Creator dashboard (manage, edit, cascade delete)
     ├── swaps.php
     ├── teaching_requests.php
     ├── saved.php
@@ -285,24 +286,24 @@ main/
 | Req | Description | Implementation |
 |:---:|---|---|
 | I | Home | `public/index.php` |
-| II | CRUD (multiple) | Skills, swaps, reviews, comments, contact, wishlist |
-| III | Navigation | `includes/nav.php` — login-aware, responsive |
+| II | CRUD (multiple) | **Skills** (Create: `posting.php`, Read: `browse.php`/`details.php`, Update/Delete: `my_skills.php` & `details.php`), **Swaps** (`swaps.php`), **Reviews** (`review_submit.php`/`review_delete.php`), **Comments** (`comment_submit.php`/`comment_delete.php`), **Contact**, **Wishlist** |
+| III | Navigation | `includes/nav.php` — login-aware, responsive, includes direct **My Skills** management |
 | IV | Contact | `public/contact.php` + `contactMessages` table |
 | V | Listing + filter | `public/browse.php` + category pills + search |
-| VI | Item details | `public/details.php` |
+| VI | Item details | `public/details.php` — includes owner edit/delete controls |
 | VII | Wishlist | `public/saved.php` + `savedSkills` |
 | VIII | Login / register | `auth/` |
-| IX | Responsive | CSS media queries (no framework) |
+| IX | Responsive | CSS media queries (no framework) across all layouts and dashboards |
 
 ---
 
-
 ## 12. Further Documentation
 
-- [docs/GUIDE_DOCS.md](docs/GUIDE_DOCS.md) — Full beginner walkthrough: folders, database, features, how to trace code
+- [codebaseDocs/GUIDE_DOC.md](codebaseDocs/GUIDE_DOC.md) — Full beginner walkthrough: folders, database, features, how to trace code
+- [codebaseDocs/report_content_swaps_reviews.md](codebaseDocs/report_content_swaps_reviews.md) — Technical deep dive: swap lifecycle, verified reviews, comments, and credit economy
 
 ---
 
 ## Status
 
-Core assignment requirements, full CRUD, swap lifecycle, verified reviews, wishlist, contact, and the credit economy are implemented and tested on WampServer. 
+Core assignment requirements, full CRUD (including complete skill creation, editing, and cascade-aware deletion), swap lifecycle, verified reviews, wishlist, contact, and the credit economy are implemented and tested on WampServer. 
